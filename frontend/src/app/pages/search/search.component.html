@@ -1,0 +1,36 @@
+<div class="search-container">
+    <form (ngSubmit)="searchLobbies()" class="search-form">
+      <label for="character">Character You Play:</label>
+      <input
+        type="text"
+        id="character"
+        [(ngModel)]="userCharacter"
+        name="character"
+        required
+      />
+      <button type="submit">Search Lobbies</button>
+    </form>
+
+    @if (
+        lobbies.length > 0
+    ) {
+    <div class="lobby-list">
+      <h3>Available Lobbies:</h3>
+      <ul>
+        @for (lobby of lobbies; track $index) {
+            <li>
+                <strong>{{ lobby.username }}</strong>'s lobby - Character: {{
+                  lobby.user_character
+                }}
+                <button (click)="joinlobby(lobby.id);">Join</button>
+            </li>
+        }
+      </ul>
+    </div>
+    } @else {
+        <div class="no-lobbies">
+            <p>No lobbies found.</p>
+        </div>
+    }
+</div>
+  

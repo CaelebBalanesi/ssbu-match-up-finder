@@ -1,0 +1,50 @@
+<div class="lobby-room">
+    <div class="chat-box">
+      <h3>Lobby Chat</h3>
+      <div class="messages">
+        @for (message of messages; track $index) {
+            <div class="message">
+                {{ message }}
+            </div>
+        }
+      </div>
+      <div class="message-input">
+        <input
+          type="text"
+          [(ngModel)]="newMessage"
+          placeholder="Type your message..."
+          (keyup.enter)="sendMessage()"
+        />
+        <button (click)="sendMessage()">Send</button>
+      </div>
+    </div>
+  
+    @if (isCreator) {
+        <div class="control-panel">
+        <h3>Lobby Control Panel</h3>
+        <label for="lobbyName">Lobby Name:</label>
+        <input
+            type="text"
+            id="lobbyName"
+            [(ngModel)]="lobby.lobby_id"
+            placeholder="Lobby Name"
+        />
+        <label for="lobbyPassword">Lobby Password:</label>
+        <input
+            type="text"
+            id="lobbyPassword"
+            [(ngModel)]="lobby.lobby_password"
+            placeholder="Lobby Password"
+        />
+        <label for="userCharacter">Your Character:</label>
+        <input
+            type="text"
+            id="userCharacter"
+            [(ngModel)]="lobby.user_character"
+            placeholder="Character"
+        />
+        <button (click)="updateLobby()">Update Lobby</button>
+        </div>
+    }
+  </div>
+  

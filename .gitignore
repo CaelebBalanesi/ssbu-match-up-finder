@@ -1,2 +1,2 @@
-backend/target
-backend/Cargo.lock
+backend/node_modules
+backend/package-lock.json
