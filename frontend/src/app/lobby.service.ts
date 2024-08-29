@@ -22,8 +22,8 @@ export class LobbyService {
   private socket: Socket;
   
   constructor(private http: HttpClient) {
-    this.socket = io('https://127.0.0.1:3000', {
-      transports: ['websockets']
+    this.socket = io('http://127.0.0.1:3000', {
+      transports: ['websockets', 'polling']
     });
 
     this.socket.on('connect_error', (error) => {
