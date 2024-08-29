@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-axum = "*"
+axum = "0.7.4"
 tokio = { version = "*", features = ["full"] }
 tower = { version = "*", features = ["full"] }
 hyper = "*"
@@ -12,3 +12,6 @@ tokio-rusqlite = "*"
 uuid = { version = "*", features = ["v4", "fast-rng"] }
 serde = { version = "*", features = ["derive"]}
 serde_json = "*"
+chrono = "*"
+tower-http = { version = "*", features = ["add-extension", "trace"] }
+async-trait = "*"
