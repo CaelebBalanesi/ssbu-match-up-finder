@@ -16,7 +16,8 @@ export interface Lobby {
 
 export interface Message {
   content: string,
-  sender: string
+  sender: string,
+  username: string,
 }
 
 @Injectable({
@@ -78,15 +79,13 @@ export class LobbyService {
     return this.http.delete(url);
   }
 
-  joinLobby(lobbyId: string): void {
-    console.log("Test");
-    this.socket.emit('joinLobby', lobbyId);
-  }
+  joinLobby(lobbyId: string, username: string): void {
+    this.socket.emit('joinLobby', { lobbyId, username });
+}
 
-  // Send a message to the lobby
-  sendMessage(lobbyId: string, message: Message): void {
-    this.socket.emit('message', { lobbyId, message });
-  }
+sendMessage(lobbyId: string, message: string, username: string): void {
+    this.socket.emit('message', { lobbyId, message, username });
+}
 
   // Listen for messages from the lobby
   onMessage(): Observable<Message> {

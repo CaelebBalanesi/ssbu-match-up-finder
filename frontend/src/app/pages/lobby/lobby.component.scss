@@ -159,12 +159,84 @@
   transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
   outline: none;
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+  margin-bottom: 10px;
 }
 
-.control-panel button:hover, .control-panel button:focus {
+.control-panel button:hover {
   background-color: #58ffab00; /* Lighter blue on hover */
   transform: translateY(-2px); /* Slight raise effect on hover */
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.25); /* Enhanced shadow on hover */
   outline: 2px solid #58ffac;
   color: #58ffac;
+}
+
+.control-panel ul {
+  list-style-type: none; /* Remove default list styling */
+  padding: 0;
+  width: 100%;
+}
+
+.control-panel li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333; /* Dark background for list items */
+  padding: 8px 10px;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  border: 1px solid #444;
+  color: #ddd;
+}
+
+.control-panel li button {
+  padding: 5px 10px; /* Smaller padding for a smaller button */
+  font-size: 0.8em; /* Smaller font size for text within the button */
+  background-color: #ff4b4b; /* Red color for emphasis on the remove action */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow for a 3D effect */
+  outline: none;
+}
+
+.control-panel li button:hover, .control-panel li button:focus {
+  background-color: #ff2e2e; /* Darker shade of red on hover/focus */
+  transform: translateY(-1px); /* Slight raise effect on hover/focus */
+  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+.select-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+select {
+  flex-grow: 1; /* Allow select to fill available space */
+  margin-right: 10px; /* Spacing between select and button */
+  background-color: #333;
+  color: #ddd;
+  border: 1px solid #444;
+  border-radius: 5px;
+  padding: 8px;
+  outline: none;
+}
+
+select:focus {
+  border-color: #555;
+}
+
+.message-username {
+  font-weight: bold;
+  color: #ccc;
+}
+
+.message-right, .message-left {
+  display: block;
+  padding: 10px;
+  margin: 5px;
+  border-radius: 10px;
+  background-color: #333; // Adjust color based on whether it's right or left
 }

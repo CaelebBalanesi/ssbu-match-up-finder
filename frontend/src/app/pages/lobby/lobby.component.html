@@ -4,9 +4,15 @@
     <div class="messages">
       @for (message of messages; track $index) {
         @if (isMyMessage(message)) {
-          <div class="message-right message-bubble">{{ message.content }}</div>
+          <div class="message-right message-bubble">
+            <div class="message-username">{{ message.username }}</div>
+            <div class="message-content">{{ message.content }}</div>
+          </div>
         } @else {
-          <div class="message-left message-bubble">{{ message.content }}</div>
+          <div class="message-left message-bubble">
+            <div class="message-username">{{ message.username }}</div>
+            <div class="message-content">{{ message.content }}</div>
+          </div>
         }
       }
     </div>
@@ -45,7 +51,24 @@
         [(ngModel)]="lobby.user_character"
         placeholder="Character"
       />
+      <label for="newCharacter">Add Character:</label>
+      <select id="newCharacter" [(ngModel)]="newSeekingCharacter" name="newCharacter">
+        @for (character of characterList; track $index) {
+          <option>{{ character }}</option>
+        }
+      </select>
+      <button (click)="addSeekingCharacter()">Add Character</button>
+    
+      <h4>Current Characters:</h4>
+      <ul>
+        @for (character of lobby.seeking_characters; track $index) {
+          <li>
+          {{ character }} <button (click)="removeSeekingCharacter($index)">Remove</button>
+          </li>
+        }
+      </ul>
       <button (click)="updateLobby()">Update Lobby</button>
+      <button (click)="shutdownLobby()">Shutdown Lobby</button>
     </div>
   }
 </div>

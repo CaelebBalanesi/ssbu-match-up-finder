@@ -18,6 +18,9 @@ export class LobbyComponent {
   isCreator: boolean = false;
   private messageSubscription!: Subscription;
   private sessionId!: string;
+  characterList: string[] = ['Mario', 'Donkey Kong', 'Link', 'Samus', 'Dark Samus', 'Yoshi', 'Kirby', 'Fox', 'Pikachu', 'Luigi', 'Ness', 'Captain Falcon', 'Jigglypuff', 'Peach', 'Daisy', 'Bowser', 'Ice Climbers', 'Sheik', 'Zelda', 'Dr.Mario', 'Pichu', 'Falco', 'Marth', 'Lucina', 'Young Link', 'Ganondorf', 'Mewtwo', 'Roy', 'Chrom', 'Mr. Game & Watch', 'Meta Knight', 'Pit', 'Dark Pit', 'Zero Suit Samus', 'Wario', 'Snake', 'Ike', 'Pokemon Trainer', 'Diddy Kong', 'Lucas', 'Sonic', 'King Dedede', 'Olimar', 'Lucario', 'R.O.B.', 'Toon Link', 'Wolf', 'Villager', 'Mega Man', 'Wii Fit Trainer', 'Rosalina & Luma', 'Little Mac', 'Greninja', 'Mii Brawler', 'Mii Gunner', 'Mii Swordfighter', 'Palutena', 'Pac-Man', 'Robin', 'Shulk', 'Bowser Jr.', 'Duck Hunt', 'Ryu', 'Ken', 'Cloud', 'Corrin', 'Bayonetta', 'Inkling', 'Ridley', 'Simon', 'Richter', 'King K. Rool', 'Isabelle', 'Incineroar', 'Piranha Plant', 'Joker', 'Hero', 'Banjo-Kazooie', 'Terry', 'Byleth', 'Min Min', 'Steve', 'Sephiroth', 'Pyra Mythra', 'Kazuya', 'Sora']; 
+  newSeekingCharacter: string = '';
+  username: string = '';
 
   constructor(
     private lobbyService: LobbyService,
@@ -32,8 +35,13 @@ export class LobbyComponent {
         (lobby: Lobby) => {
           this.lobby = lobby;
           this.isCreator = this.checkIfCreator(lobby);
+          if (!this.isCreator) {
+            this.username = prompt("Enter your username:") || "Anonymous";
+          } else {
+            this.username = this.lobby.username;
+          }
           console.log(`joining: ${this.lobby.id}`);
-          this.lobbyService.joinLobby(this.lobby.id);
+          this.lobbyService.joinLobby(this.lobby.id, this.username);
           console.log(this.isCreator);
         },
         (error: any) => console.error(error)
@@ -41,19 +49,19 @@ export class LobbyComponent {
 
       // Subscribe to incoming messages
       this.messageSubscription = this.lobbyService.onMessage().subscribe(
-        (message: Message) => this.messages.push(message)
+        (message: Message) => {
+            this.messages.push(message);
+            console.log('New message received:', message);
+        },
+        (error) => console.error('Error receiving messages:', error)
       );
     }
   }
 
   sendMessage(): void {
     if (this.newMessage.trim()) {
-      const message: Message = {
-        content: this.newMessage,
-        sender: this.sessionId
-      };
-      this.lobbyService.sendMessage(this.lobby.id, message);
-      this.newMessage = '';
+        this.lobbyService.sendMessage(this.lobby.id, this.newMessage, this.username);
+        this.newMessage = '';
     }
   }
 
@@ -69,12 +77,36 @@ export class LobbyComponent {
   }
 
   isMyMessage(message: Message): boolean {
-    return message.sender === this.sessionId;
+    return message.username === this.username;
+  }
+
+  shutdownLobby(): void {
+    if (this.isCreator) {
+      console.log(this.lobby.id);
+      this.lobbyService.deleteLobby(this.lobby.id).subscribe();
+    }
+  }
+
+  addSeekingCharacter(): void {
+    if (!this.lobby.seeking_characters.includes(this.newSeekingCharacter)) {
+      this.lobby.seeking_characters.push(this.newSeekingCharacter);
+      this.updateLobby();
+    }
+  }
+
+  removeSeekingCharacter(index: number): void {
+    this.lobby.seeking_characters.splice(index, 1);
+    this.updateLobby();
   }
 
   ngOnDestroy(): void {
     if (this.messageSubscription) {
       this.messageSubscription.unsubscribe();
+    }
+
+    if (this.isCreator) {
+      console.log(this.lobby.id);
+      this.lobbyService.deleteLobby(this.lobby.id).subscribe();
     }
   }
 }

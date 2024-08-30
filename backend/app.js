@@ -110,27 +110,33 @@ io.on('connection', (socket) => {
   let sessionId = socket.handshake.query.sessionId;
   console.log(sessionId);
   if (sessionId == 'null') {
-    console.log("test");
     sessionId = uuid.v4();
     socket.emit('sessionId', sessionId);
   }
   console.log("test2");
   socket.sessionId = sessionId;
 
-  socket.on('joinLobby', (lobbyId) => {
-    console.log(`User ${socket.id} with session id: ${socket.sessionId} joined lobby: ${lobbyId}`);
+  socket.on('joinLobby', (data) => {
+    const { lobbyId, username } = data;
     socket.join(lobbyId);
+    socket.username = username;  // Store username in socket session
+    console.log(`User ${username} with session ID: ${socket.sessionId} joined lobby: ${lobbyId}`);
+    // Notify others in the lobby that a new user has joined
+    socket.to(lobbyId).emit('userJoined', { username });
   });
+
 
   socket.on('message', (data) => {
     const { lobbyId, message } = data;
-    io.to(lobbyId).emit('message', message);
-    console.log(`Message sent to lobby ${lobbyId}: ${message}`);
+    // Use stored username from the socket session
+    io.to(lobbyId).emit('message', { content: message, username: socket.username });
+    console.log(`Message from ${socket.username} in lobby ${lobbyId}: ${message}`);
   });
+
 
   socket.on('disconnect', () => {
     console.log('User disconnected', socket.id);
-  });
+});
 });
 
 server.listen(port, () => {
