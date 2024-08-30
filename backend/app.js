@@ -4,6 +4,8 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const db = require('./database');
+const cookieParser = require('cookie-parser');
+const uuid = require('uuid');
 
 const app = express();
 const server = http.createServer(app);
@@ -19,16 +21,17 @@ const io = new Server(server, {
 app.use(bodyParser.json());
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 port = 3000;
 
 // Create a new lobby
 app.post('/lobbies', (req, res) => {
-  const { id, username, lobby_id, lobby_password, user_character, seeking_characters, created_time } = req.body;
+  const { id, username, lobby_id, lobby_password, user_character, seeking_characters, created_time, sessionId } = req.body;
   db.run(
-    `INSERT INTO lobbies (id, username, lobby_id, lobby_password, user_character, seeking_characters, created_time)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [id, username, lobby_id, lobby_password, user_character, JSON.stringify(seeking_characters), created_time],
+    `INSERT INTO lobbies (id, username, lobby_id, lobby_password, user_character, seeking_characters, created_time, sessionId)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [id, username, lobby_id, lobby_password, user_character, JSON.stringify(seeking_characters), created_time, sessionId],
     function (err) {
       if (err) {
         return res.status(500).json({ error: err.message });
@@ -104,11 +107,16 @@ app.delete('/lobbies/:id', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
+  let sessionId = socket.handshake.query.sessionId;
+  if (!sessionId) {
+    sessionId = uuid.v4();
+    socket.emit('sessionId', sessionId);
+  }
+  socket.sessionId = sessionId;
 
   socket.on('joinLobby', (lobbyId) => {
+    console.log(`User ${socket.id} with session id: ${socket.sessionId} joined lobby: ${lobbyId}`);
     socket.join(lobbyId);
-    console.log(`User ${socket.id} joined lobby: ${lobbyId}`);
   });
 
   socket.on('message', (data) => {

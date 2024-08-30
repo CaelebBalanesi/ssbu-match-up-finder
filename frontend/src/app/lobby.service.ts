@@ -11,6 +11,7 @@ export interface Lobby {
   user_character: string;
   seeking_characters: string[];
   created_time: string;
+  sessionId: string;
 }
 
 @Injectable({
@@ -22,10 +23,20 @@ export class LobbyService {
   private socket: Socket;
   
   constructor(private http: HttpClient) {
-    this.socket = io('http://127.0.0.1:3000', {
+    const sessionId = localStorage.getItem('sessionId');
+    this.socket = io('http://localhost:3000', {
+      query: { sessionId: sessionId },
       transports: ['websockets', 'polling']
     });
-
+  
+    this.socket.on('connect', () => {
+      console.log('Connected to WebSocket server');
+    });
+  
+    this.socket.on('sessionId', (newSessionId: string) => {
+      localStorage.setItem('sessionId', newSessionId);
+    });
+  
     this.socket.on('connect_error', (error) => {
       console.error('Connection Error:', error);
     });

@@ -29,9 +29,10 @@ export class LobbyComponent {
       this.lobbyService.getLobby(id).subscribe(
         (lobby: Lobby) => {
           this.lobby = lobby;
-          this.isCreator = lobby.username === 'currentUsername'; // Replace 'currentUsername' with the actual current user's username
+          this.isCreator = this.checkIfCreator(lobby);
           console.log(`joining: ${this.lobby.id}`);
           this.lobbyService.joinLobby(this.lobby.id);
+          console.log(this.isCreator);
         },
         (error: any) => console.error(error)
       );
@@ -55,6 +56,12 @@ export class LobbyComponent {
       () => alert('Lobby updated successfully'),
       (error: any) => console.error(error)
     );
+  }
+
+  private checkIfCreator(lobby: Lobby): boolean {
+    const sessionId = localStorage.getItem('sessionId');
+    console.log(`The user session ID: ${sessionId}\nThe lobby session ID: ${lobby.sessionId}`);
+    return lobby.sessionId === sessionId;
   }
 
   ngOnDestroy(): void {

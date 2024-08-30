@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { LobbyService, Lobby } from '../../lobby.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './create.component.html',
   styleUrl: './create.component.scss'
 })
-export class CreateComponent {
+export class CreateComponent implements OnInit {
   lobby: Lobby = {
     id: '',
     username: '',
@@ -18,12 +18,18 @@ export class CreateComponent {
     lobby_password: '',
     user_character: '',
     seeking_characters: [],
-    created_time: new Date().toISOString()
+    created_time: new Date().toISOString(),
+    sessionId: '',  // Initialize sessionId
   };
 
   seekingCharacter: string = '';
 
   constructor(private lobbyService: LobbyService, private router: Router) {}
+
+  ngOnInit() {
+    // Retrieve session ID from local storage
+    this.lobby.sessionId = localStorage.getItem('sessionId') || '';
+  }
 
   onAddSeekingCharacter() {
     if (this.seekingCharacter) {

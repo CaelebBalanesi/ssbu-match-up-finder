@@ -10,7 +10,8 @@ db.serialize(() => {
         lobby_password TEXT NOT NULL,
         user_character TEXT NOT NULL,
         seeking_characters TEXT NOT NULL,
-        created_time TEXT NOT NULL
+        created_time TEXT NOT NULL,
+        sessionId TEXT NOT NULL
       )
     `);
 });
