@@ -1,41 +1,49 @@
 <body>
   <div class="form-container">
-      <h2>Create a Lobby</h2>
-      <form (ngSubmit)="onSubmit()">
-        <div class="form-group">
-          <label for="username">Your Name:</label>
-          <input type="text" id="username" [(ngModel)]="lobby.username" name="username" required>
+    <h2>Create a Lobby</h2>
+    <form (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="username">Your Name:</label>
+        <input type="text" id="username" [(ngModel)]="lobby.username" name="username" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="user_character">Your Character:</label>
+        <select id="user_character" [(ngModel)]="lobby.user_character" name="user_character" required>
+          @for (character of characterList; track $index) {
+            <option>{{ character }}</option>
+          }
+        </select>
+      </div>
+  
+      <div class="form-group">
+        <label for="seeking_character">Seeking Character:</label>
+        <div class="seeking-input">
+          <select id="seeking_character" [(ngModel)]="seekingCharacter" name="seeking_character">
+            @for (character of characterList; track $index) {
+              <option>{{ character }}</option>
+            }
+          </select>
+          <button type="button" class="addbtn" (click)="onAddSeekingCharacter()">Add</button>
         </div>
-        
-        <div class="form-group">
-          <label for="user_character">Your Character:</label>
-          <input type="text" id="user_character" [(ngModel)]="lobby.user_character" name="user_character" required>
-        </div>
-    
-        <div class="form-group">
-          <label for="seeking_character">Seeking Character:</label>
-          <div class="seeking-input">
-            <input type="text" id="seeking_character" [(ngModel)]="seekingCharacter" name="seeking_character">
-            <button type="button" class="addbtn" (click)="onAddSeekingCharacter()">Add</button>
-          </div>
-          <ul>
-              @for (character of lobby.seeking_characters; track $index) {
-                  <li>{{ character }}</li>
-              }
-          </ul>
-        </div>
-    
-        <div class="form-group">
-          <label for="lobby_id">Lobby ID:</label>
-          <input type="text" id="lobby_id" [(ngModel)]="lobby.lobby_id" name="lobby_id" required>
-        </div>
-    
-        <div class="form-group">
-          <label for="lobby_password">Lobby Password:</label>
-          <input type="password" id="lobby_password" [(ngModel)]="lobby.lobby_password" name="lobby_password" required>
-        </div>
-    
-        <button type="submit" class="btn">Create Lobby</button>
-      </form>
+        <ul>
+          @for (character of lobby.seeking_characters; track $index) {
+            <li>{{ character }}</li>
+          }
+        </ul>
+      </div>
+  
+      <div class="form-group">
+        <label for="lobby_id">Lobby ID:</label>
+        <input type="text" id="lobby_id" [(ngModel)]="lobby.lobby_id" name="lobby_id" required>
+      </div>
+  
+      <div class="form-group">
+        <label for="lobby_password">Lobby Password:</label>
+        <input type="password" id="lobby_password" [(ngModel)]="lobby.lobby_password" name="lobby_password" required>
+      </div>
+  
+      <button type="submit" class="btn">Create Lobby</button>
+    </form>
   </div>
 </body>

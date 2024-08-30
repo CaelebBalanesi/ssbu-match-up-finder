@@ -14,6 +14,11 @@ export interface Lobby {
   sessionId: string;
 }
 
+export interface Message {
+  content: string,
+  sender: string
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -34,6 +39,7 @@ export class LobbyService {
     });
   
     this.socket.on('sessionId', (newSessionId: string) => {
+      console.log(`SessionId: ${newSessionId}`);
       localStorage.setItem('sessionId', newSessionId);
     });
   
@@ -78,14 +84,14 @@ export class LobbyService {
   }
 
   // Send a message to the lobby
-  sendMessage(lobbyId: string, message: string): void {
+  sendMessage(lobbyId: string, message: Message): void {
     this.socket.emit('message', { lobbyId, message });
   }
 
   // Listen for messages from the lobby
-  onMessage(): Observable<string> {
-    return new Observable<string>((observer) => {
-      this.socket.on('message', (message: string) => {
+  onMessage(): Observable<Message> {
+    return new Observable<Message>((observer) => {
+      this.socket.on('message', (message: Message) => {
         observer.next(message);
       });
     });

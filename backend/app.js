@@ -108,10 +108,13 @@ app.delete('/lobbies/:id', (req, res) => {
 
 io.on('connection', (socket) => {
   let sessionId = socket.handshake.query.sessionId;
-  if (!sessionId) {
+  console.log(sessionId);
+  if (sessionId == 'null') {
+    console.log("test");
     sessionId = uuid.v4();
     socket.emit('sessionId', sessionId);
   }
+  console.log("test2");
   socket.sessionId = sessionId;
 
   socket.on('joinLobby', (lobbyId) => {

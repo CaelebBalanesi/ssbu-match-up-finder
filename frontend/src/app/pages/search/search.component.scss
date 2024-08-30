@@ -5,8 +5,8 @@ body {
   justify-content: center;
   align-items: center;
   font-family: 'Arial', sans-serif;
-  background-color: #121212; /* Dark background for the body */
-  color: #e0e0e0; /* Light text color for better readability on dark background */
+  background-color: #121212;
+  color: #e0e0e0;
 }
 
 .search-container {
@@ -14,7 +14,7 @@ body {
   flex-direction: column;
   align-items: center;
   margin-top: 50px;
-  color: #e0e0e0; /* Light text color for readability on dark backgrounds */
+  color: #e0e0e0;
 }
 
 .search-form {
@@ -22,7 +22,7 @@ body {
   flex-direction: column;
   align-items: center;
   margin-bottom: 30px;
-  background-color: #222; /* Dark background for form */
+  background-color: #222;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
@@ -31,41 +31,42 @@ body {
 .search-form label {
   margin-bottom: 10px;
   font-size: 1.2em;
-  color: #ccc; /* Lighter label color for contrast */
+  color: #ccc;
 }
 
-.search-form input {
-  padding: 10px;
+.search-form select {
+  width: 85%;
+  padding: 6px;
   font-size: 1em;
   margin-bottom: 10px;
-  background-color: #333; /* Dark background for input fields */
+  background-color: #333;
   border: 1px solid #444;
   border-radius: 5px;
-  color: #ddd; /* Light color text in inputs */
-  outline: none; /* Remove the outline to maintain the style on focus */
+  color: #ddd;
+  outline: none;
 }
 
-.search-form input:focus {
-  background-color: #444; /* Slightly lighter on focus for visual feedback */
-  border-color: #555; /* Highlight border on focus */
+.search-form select:focus {
+  background-color: #444;
+  border-color: #555;
 }
 
 .search-form button {
   padding: 10px 20px;
   font-size: 1em;
   cursor: pointer;
-  background-color: #58ffac; /* Consistent with other buttons */
+  background-color: #58ffac;
   color: black;
   border: none;
-  border-radius: 8px; /* Rounded borders */
+  border-radius: 8px;
   transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
   outline: none;
 }
 
 .search-form button:hover, .search-form button:focus {
-  background-color: #58ffab00; /* Lighter blue on hover */
-  transform: translateY(-2px); /* Slight raise effect on hover */
+  background-color: #58ffab00;
+  transform: translateY(-2px);
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.25);
   outline: 2px solid #58ffac;
   color: #58ffac;
@@ -82,7 +83,7 @@ body {
 
 .lobby-list h3 {
   text-align: center;
-  color: #fff; /* White color for headings */
+  color: #fff;
 }
 
 .lobby-list ul {
@@ -95,7 +96,7 @@ body {
   border: 1px solid #444;
   margin-bottom: 10px;
   border-radius: 8px;
-  background-color: #333; /* Darker background for list items */
+  background-color: #333;
   display: flex;
   justify-content: space-between;
   align-items: center;

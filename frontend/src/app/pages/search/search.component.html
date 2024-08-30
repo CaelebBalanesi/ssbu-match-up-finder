@@ -1,14 +1,12 @@
 <body>
 <div class="search-container">
     <form (ngSubmit)="searchLobbies()" class="search-form">
-      <label for="character">Character You Play:</label>
-      <input
-        type="text"
-        id="character"
-        [(ngModel)]="userCharacter"
-        name="character"
-        required
-      />
+      <label for="character">Your Character:</label>
+        <select id="character" [(ngModel)]="userCharacter" name="character" required>
+          @for (character of characterList; track $index) {
+            <option>{{ character }}</option>
+          }
+        </select>
       <button type="submit">Search Lobbies</button>
     </form>
 

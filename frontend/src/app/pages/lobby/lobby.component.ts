@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { LobbyService, Lobby } from '../../lobby.service';
+import { LobbyService, Lobby, Message } from '../../lobby.service';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
@@ -13,10 +13,11 @@ import { Subscription } from 'rxjs';
 })
 export class LobbyComponent {
   lobby!: Lobby;
-  messages: string[] = [];
+  messages: Message[] = [];
   newMessage: string = '';
   isCreator: boolean = false;
   private messageSubscription!: Subscription;
+  private sessionId!: string;
 
   constructor(
     private lobbyService: LobbyService,
@@ -24,6 +25,7 @@ export class LobbyComponent {
   ) {}
 
   ngOnInit(): void {
+    this.sessionId = localStorage.getItem('sessionId') || '';
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.lobbyService.getLobby(id).subscribe(
@@ -39,14 +41,18 @@ export class LobbyComponent {
 
       // Subscribe to incoming messages
       this.messageSubscription = this.lobbyService.onMessage().subscribe(
-        (message: string) => this.messages.push(message)
+        (message: Message) => this.messages.push(message)
       );
     }
   }
 
   sendMessage(): void {
     if (this.newMessage.trim()) {
-      this.lobbyService.sendMessage(this.lobby.id, this.newMessage);
+      const message: Message = {
+        content: this.newMessage,
+        sender: this.sessionId
+      };
+      this.lobbyService.sendMessage(this.lobby.id, message);
       this.newMessage = '';
     }
   }
@@ -59,9 +65,11 @@ export class LobbyComponent {
   }
 
   private checkIfCreator(lobby: Lobby): boolean {
-    const sessionId = localStorage.getItem('sessionId');
-    console.log(`The user session ID: ${sessionId}\nThe lobby session ID: ${lobby.sessionId}`);
-    return lobby.sessionId === sessionId;
+    return lobby.sessionId === this.sessionId;
+  }
+
+  isMyMessage(message: Message): boolean {
+    return message.sender === this.sessionId;
   }
 
   ngOnDestroy(): void {
