@@ -20,7 +20,8 @@ export class CreateComponent implements OnInit {
     user_character: '',
     seeking_characters: [],
     created_time: new Date().toISOString(),
-    sessionId: '',  // Initialize sessionId
+    sessionId: '',
+    full: false,
   };
 
   seekingCharacter: string = '';

@@ -1,7 +1,7 @@
 <div class="lobby-room">
   <div class="chat-box">
     <h3>Lobby Chat</h3>
-    <div class="messages">
+    <div class="messages" #messagesContainer>
       @for (message of messages; track $index) {
         @if (isMyMessage(message)) {
           <div class="message-right message-bubble">
@@ -28,7 +28,7 @@
   </div>
 
   @if (isCreator) {
-    <div class="control-panel">
+    <div class="side-panel">
       <h3>Lobby Control Panel</h3>
       <label for="lobbyName">Lobby Name:</label>
       <input
@@ -69,6 +69,12 @@
       </ul>
       <button (click)="updateLobby()">Update Lobby</button>
       <button (click)="shutdownLobby()">Shutdown Lobby</button>
+    </div>
+  } @else {
+    <div class="side-panel">
+      <h3>Lobby Information</h3>
+      <h4>Lobby ID: {{lobby.lobby_id}}</h4>
+      <h4>Lobby Password: {{lobby.lobby_password}}</h4>
     </div>
   }
 </div>

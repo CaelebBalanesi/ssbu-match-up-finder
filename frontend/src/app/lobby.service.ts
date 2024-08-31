@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { io, Socket } from 'socket.io-client'
 
 export interface Lobby {
@@ -12,6 +12,7 @@ export interface Lobby {
   seeking_characters: string[];
   created_time: string;
   sessionId: string;
+  full: boolean;
 }
 
 export interface Message {
@@ -27,6 +28,8 @@ export class LobbyService {
 
   private apiUrl = 'http://localhost:3000/lobbies';
   private socket: Socket;
+  public lobbyFull = new Subject<boolean>();
+  public joinedLobby = new Subject<any>();
   
   constructor(private http: HttpClient) {
     const sessionId = localStorage.getItem('sessionId');
@@ -46,6 +49,16 @@ export class LobbyService {
   
     this.socket.on('connect_error', (error) => {
       console.error('Connection Error:', error);
+    });
+
+    this.socket.on('lobbyFull', () => {
+      console.log('Lobby is full');
+      this.lobbyFull.next(true);
+    });
+
+    this.socket.on('joinedLobby', (data) => {
+      console.log('Joined lobby:', data.lobbyId);
+      this.joinedLobby.next(data);
     });
   }
 
@@ -83,9 +96,14 @@ export class LobbyService {
     this.socket.emit('joinLobby', { lobbyId, username });
 }
 
-sendMessage(lobbyId: string, message: string, username: string): void {
-    this.socket.emit('message', { lobbyId, message, username });
-}
+  sendMessage(lobbyId: string, message: string, username: string): void {
+    console.log(username);
+      this.socket.emit('message', { lobbyId, message, username });
+  }
+
+  leaveLobby(): void {
+    this.socket.emit('disconnect');
+  }
 
   // Listen for messages from the lobby
   onMessage(): Observable<Message> {

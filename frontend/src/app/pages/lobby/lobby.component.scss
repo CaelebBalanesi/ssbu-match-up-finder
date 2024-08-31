@@ -30,11 +30,11 @@
   padding: 10px;
   overflow-y: scroll;
   margin-bottom: 10px;
-  background-color: #333; /* Darker background for messages */
+  background-color: #333;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
-  gap: 10px; /* Space between message bubbles */
+  gap: 10px;
 }
 
 .message-bubble {
@@ -106,7 +106,7 @@
   outline: 2px solid #58ffac;
 }
 
-.control-panel {
+.side-panel {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -117,18 +117,22 @@
   height: fit-content;
 }
 
-.control-panel h3 {
+.side-panel h3 {
   margin-bottom: 10px;
   color: #fff; /* White color for headings */
 }
 
-.control-panel label {
+.side-panel h4 {
+  margin-bottom: 10px;
+}
+
+.side-panel label {
   margin-bottom: 5px;
   font-weight: bold;
   color: #ccc; /* Light color for labels */
 }
 
-.control-panel input {
+.side-panel input {
   padding: 10px;
   font-size: 1em;
   margin-bottom: 10px;
@@ -139,16 +143,16 @@
   outline: none;
 }
 
-.control-panel input::placeholder {
+.side-panel input::placeholder {
   color: #888; /* Lighter placeholder text */
 }
 
-.control-panel input:focus {
+.side-panel input:focus {
   background-color: #444; /* Slightly lighter on focus */
   border-color: #555; /* Highlight border on focus */
 }
 
-.control-panel button {
+.side-panel button {
   padding: 10px 20px;
   font-size: 1em;
   cursor: pointer;
@@ -162,7 +166,7 @@
   margin-bottom: 10px;
 }
 
-.control-panel button:hover {
+.side-panel button:hover {
   background-color: #58ffab00; /* Lighter blue on hover */
   transform: translateY(-2px); /* Slight raise effect on hover */
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.25); /* Enhanced shadow on hover */
@@ -170,13 +174,13 @@
   color: #58ffac;
 }
 
-.control-panel ul {
+.side-panel ul {
   list-style-type: none; /* Remove default list styling */
   padding: 0;
   width: 100%;
 }
 
-.control-panel li {
+.side-panel li {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -188,7 +192,7 @@
   color: #ddd;
 }
 
-.control-panel li button {
+.side-panel li button {
   padding: 5px 10px; /* Smaller padding for a smaller button */
   font-size: 0.8em; /* Smaller font size for text within the button */
   background-color: #ff4b4b; /* Red color for emphasis on the remove action */
@@ -201,7 +205,7 @@
   outline: none;
 }
 
-.control-panel li button:hover, .control-panel li button:focus {
+.side-panel li button:hover, .side-panel li button:focus {
   background-color: #ff2e2e; /* Darker shade of red on hover/focus */
   transform: translateY(-1px); /* Slight raise effect on hover/focus */
   box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
@@ -228,15 +232,12 @@ select:focus {
   border-color: #555;
 }
 
-.message-username {
+.message-right .message-username {
   font-weight: bold;
-  color: #ccc;
+  color: #292929;
 }
 
-.message-right, .message-left {
-  display: block;
-  padding: 10px;
-  margin: 5px;
-  border-radius: 10px;
-  background-color: #333; // Adjust color based on whether it's right or left
+.message-left .message-username {
+  font-weight: bold;
+  color: #ccc;
 }

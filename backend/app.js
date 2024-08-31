@@ -18,6 +18,8 @@ const io = new Server(server, {
   transports: ['websocket', 'polling']
 });
 
+const lobbies = {};
+
 app.use(bodyParser.json());
 app.use(cors());
 app.use(express.json());
@@ -36,6 +38,7 @@ app.post('/lobbies', (req, res) => {
       if (err) {
         return res.status(500).json({ error: err.message });
       }
+      lobbies[lobby_id] = { users: [], maxUsers: 2 }; // Initialize lobby with user tracking
       res.status(201).json({ id: this.lastID });
     }
   );
@@ -47,10 +50,16 @@ app.get('/lobbies', (req, res) => {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
-    res.json(rows.map(row => ({
-      ...row,
-      seeking_characters: JSON.parse(row.seeking_characters)
-    })));
+    res.json(rows.map(row => {
+      const lobbyId = row.lobby_id;
+      const lobby = lobbies[lobbyId] || { users: [], maxUsers: 2 };
+      const isFull = lobby.users.length >= lobby.maxUsers;
+      return {
+        ...row,
+        seeking_characters: JSON.parse(row.seeking_characters),
+        full: isFull
+      };
+    }));
   });
 });
 
@@ -64,9 +73,13 @@ app.get('/lobbies/:id', (req, res) => {
     if (!row) {
       return res.status(404).json({ error: 'Lobby not found' });
     }
+    const lobbyId = row.lobby_id;
+    const lobby = lobbies[lobbyId] || { users: [], maxUsers: 2 };
+    const isFull = lobby.users.length >= lobby.maxUsers;
     res.json({
       ...row,
-      seeking_characters: JSON.parse(row.seeking_characters)
+      seeking_characters: JSON.parse(row.seeking_characters),
+      full: isFull
     });
   });
 });
@@ -102,41 +115,57 @@ app.delete('/lobbies/:id', (req, res) => {
     if (this.changes === 0) {
       return res.status(404).json({ error: 'Lobby not found' });
     }
+    const lobby = Object.keys(lobbies).find(lobbyId => lobbies[lobbyId].id === id);
+    if (lobby) delete lobbies[lobby];
     res.json({ message: 'Lobby deleted' });
   });
 });
 
 io.on('connection', (socket) => {
   let sessionId = socket.handshake.query.sessionId;
-  console.log(sessionId);
   if (sessionId == 'null') {
     sessionId = uuid.v4();
     socket.emit('sessionId', sessionId);
   }
-  console.log("test2");
   socket.sessionId = sessionId;
 
   socket.on('joinLobby', (data) => {
     const { lobbyId, username } = data;
-    socket.join(lobbyId);
-    socket.username = username;  // Store username in socket session
-    console.log(`User ${username} with session ID: ${socket.sessionId} joined lobby: ${lobbyId}`);
-    // Notify others in the lobby that a new user has joined
-    socket.to(lobbyId).emit('userJoined', { username });
-  });
+    const lobby = lobbies[lobbyId] || (lobbies[lobbyId] = { users: [], maxUsers: 2 });
 
+    if (lobby.users.length >= lobby.maxUsers) {
+        socket.emit('lobbyFull', { message: 'This lobby is full.' });
+        return;
+    }
+
+    lobby.users.push({ userId: socket.id, username: username });
+    socket.join(lobbyId);
+
+    // Notify others in the lobby
+    socket.to(lobbyId).emit('userJoined', { username: username });
+
+    // Notify user of successful join
+    socket.emit('joinedLobby', { lobbyId: lobbyId, users: lobby.users });
+  });
 
   socket.on('message', (data) => {
-    const { lobbyId, message } = data;
-    // Use stored username from the socket session
-    io.to(lobbyId).emit('message', { content: message, username: socket.username });
-    console.log(`Message from ${socket.username} in lobby ${lobbyId}: ${message}`);
+    const { lobbyId, message, username } = data;
+    io.to(lobbyId).emit('message', { lobbyId: lobbyId, content: message, username: username });
   });
 
-
   socket.on('disconnect', () => {
-    console.log('User disconnected', socket.id);
-});
+    Object.keys(lobbies).forEach(lobbyId => {
+        const lobby = lobbies[lobbyId];
+        const index = lobby.users.findIndex(user => user.userId === socket.id);
+        if (index !== -1) {
+            const [user] = lobby.users.splice(index, 1);
+            socket.to(lobbyId).emit('userLeft', { userId: socket.id, username: user.username });
+            if (lobby.users.length === 0) {
+              delete lobbies[lobbyId]; // Optionally remove empty lobbies
+            }
+        }
+    });
+  });
 });
 
 server.listen(port, () => {

@@ -21,7 +21,7 @@ export class SearchComponent {
     this.lobbyService.getLobbies().subscribe(
       (data: Lobby[]) => {
         this.lobbies = data.filter(lobby =>
-          lobby.seeking_characters.includes(this.userCharacter)
+          lobby.seeking_characters.includes(this.userCharacter) && !lobby.full
         );
       },
       (error: any) => console.error(error)
