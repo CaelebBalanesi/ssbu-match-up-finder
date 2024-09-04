@@ -29,24 +29,29 @@ port = 3000;
 
 // Create a new lobby
 app.post('/lobbies', (req, res) => {
-  const { id, username, lobby_id, lobby_password, user_character, seeking_characters, created_time, sessionId } = req.body;
-
-  console.log(`[NEW LOBBY](${id})
-  Created at: ${created_time}
-  Creator Name: ${username}
-  Creator Character: ${user_character}
-  Seeking: ${seeking_characters}
-  `);
+  // Pull data into variables from request body
+  const { id, host_username, host_session_id, smash_lobby_id, smash_lobby_password, host_character, seeking_characters, created_time } = req.body;
 
   db.run(
-    `INSERT INTO lobbies (id, username, lobby_id, lobby_password, user_character, seeking_characters, created_time, sessionId)
+    `INSERT INTO lobbies (id, host_username, host_session_id, smash_lobby_id, smash_lobby_password, host_character, seeking_characters, created_time)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [id, username, lobby_id, lobby_password, user_character, JSON.stringify(seeking_characters), created_time, sessionId],
+    [id, host_username, host_session_id, smash_lobby_id, smash_lobby_password, host_character, JSON.stringify(seeking_characters), created_time],
     function (err) {
       if (err) {
+        // Log error creating lobby to console.
+        console.log(`[NEW LOBBY](ERROR) ${err.message}`);
         return res.status(500).json({ error: err.message });
       }
-      lobbies[lobby_id] = { users: [], maxUsers: 2 };
+      // Log new lobby to console.
+      console.log(`[NEW LOBBY](${id})
+      Created at: ${created_time}
+      Creator Name: ${host_username}
+      Creator Character: ${host_character}
+      Seeking: ${seeking_characters}
+      `);
+
+      // Create lobby entry
+      lobbies[id] = { users: [], maxUsers: 2 };
       res.status(201).json({ id: this.lastID });
     }
   );
@@ -60,9 +65,12 @@ app.get('/lobbies', (req, res) => {
       return res.status(500).json({ error: err.message });
     }
     res.json(rows.map(row => {
-      const lobbyId = row.lobby_id;
-      const lobby = lobbies[lobbyId] || { users: [], maxUsers: 2 };
-      const isFull = lobby.users.length >= lobby.maxUsers;
+      const lobbyId = row.id;
+      if (!lobbies[lobbyId]) {
+        lobbies[lobbyId] = { users: [], maxUsers: 2 };
+      }
+      console.log(`Lobby amount: ${lobbies[lobbyId].users.length}`);
+      const isFull = lobbies[lobbyId].users.length >= 2;
       return {
         ...row,
         seeking_characters: JSON.parse(row.seeking_characters),
@@ -83,9 +91,9 @@ app.get('/lobbies/:id', (req, res) => {
     if (!row) {
       return res.status(404).json({ error: 'Lobby not found' });
     }
-    const lobbyId = row.lobby_id;
-    const lobby = lobbies[lobbyId] || { users: [], maxUsers: 2 };
-    const isFull = lobby.users.length >= lobby.maxUsers;
+    const lobby = lobbies[id] || { users: [], maxUsers: 2 };
+    console.log(`Lobby amount: ${lobby.users.length}`);
+    const isFull = lobbies[id].users.length >= 2;
     res.json({
       ...row,
       seeking_characters: JSON.parse(row.seeking_characters),
@@ -97,14 +105,14 @@ app.get('/lobbies/:id', (req, res) => {
 // Update a lobby
 app.put('/lobbies/:id', (req, res) => {
   const { id } = req.params;
-  const { username, lobby_id, lobby_password, user_character, seeking_characters, created_time } = req.body;
+  const { host_username, smash_lobby_id, smash_lobby_password, host_character, seeking_characters, created_time } = req.body;
   console.log(`[LOBBY] Updated lobby ID: ${id}`);
   console.log(req.body);
   db.run(
     `UPDATE lobbies
-     SET username = ?, lobby_id = ?, lobby_password = ?, user_character = ?, seeking_characters = ?, created_time = ?
+     SET host_username = ?, smash_lobby_id = ?, smash_lobby_password = ?, host_character = ?, seeking_characters = ?, created_time = ?
      WHERE id = ?`,
-    [username, lobby_id, lobby_password, user_character, JSON.stringify(seeking_characters), created_time, id],
+    [host_username, smash_lobby_id, smash_lobby_password, host_character, JSON.stringify(seeking_characters), created_time, id],
     function (err) {
       if (err) {
         return res.status(500).json({ error: err.message });
@@ -136,32 +144,33 @@ app.delete('/lobbies/:id', (req, res) => {
 
 io.on('connection', (socket) => {
   let sessionId = socket.handshake.query.sessionId;
+
   if (sessionId == 'null') {
     sessionId = uuid.v4();
     socket.emit('sessionId', sessionId);
   }
+
   socket.sessionId = sessionId;
   console.log(`[CONNECTION] New session ID: ${sessionId}`);
 
   socket.on('joinLobby', (data) => {
     const { lobbyId, username } = data;
-    const lobby = lobbies[lobbyId] || (lobbies[lobbyId] = { users: [], maxUsers: 2 });
 
-    if (lobby.users.length >= lobby.maxUsers) {
+    if (lobbies[lobbyId].users.length >= lobbies[lobbyId].maxUsers) {
       console.log(`[LOBBY FULL] ${username} rejected from lobby ID: ${lobbyId}`);
       socket.emit('lobbyFull', { message: 'This lobby is full.' });
       return;
     }
 
     console.log(`[JOINED LOBBY] ${username} joined lobby ID: ${lobbyId}`);
-    lobby.users.push({ userId: socket.id, username: username });
+    lobbies[lobbyId].users.push({ userId: socket.id, username: username });
     socket.join(lobbyId);
 
     // Notify others in the lobby
     socket.to(lobbyId).emit('userJoined', { username: username });
 
     // Notify user of successful join
-    socket.emit('joinedLobby', { lobbyId: lobbyId, users: lobby.users });
+    socket.emit('joinedLobby', { lobbyId: lobbyId, users: lobbies[lobbyId].users });
   });
 
   socket.on('message', (data) => {
@@ -172,14 +181,14 @@ io.on('connection', (socket) => {
     io.to(lobbyId).emit('message', { lobbyId: lobbyId, content: message, username: username });
   });
 
-  socket.on('disconnect', () => {
+  socket.on('disconnectFromLobby', () => {
     Object.keys(lobbies).forEach(lobbyId => {
-        const lobby = lobbies[lobbyId];
-        const index = lobby.users.findIndex(user => user.userId === socket.id);
+        const index = lobbies[lobbyId].users.findIndex(user => user.userId === socket.id);
         if (index !== -1) {
-            const [user] = lobby.users.splice(index, 1);
-            console.log(`[DISCONNECT] ${user.username} left Lobby ID: ${lobby.id}`);
-            socket.to(lobbyId).emit('userLeft', { userId: socket.id, username: user.username });
+          const { username } = lobbies[lobbyId].users[index];
+          lobbies[lobbyId].users.splice(index, 1);
+          console.log(`[DISCONNECT] ${username} disconnected from lobby ID: ${lobbyId}`);
+          socket.to(lobbyId).emit('userLeft', { username: username });
         }
     });
   });

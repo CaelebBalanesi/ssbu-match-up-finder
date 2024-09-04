@@ -14,13 +14,13 @@ import { FormsModule } from '@angular/forms';
 export class CreateComponent implements OnInit {
   lobby: Lobby = {
     id: '',
-    username: '',
-    lobby_id: '',
-    lobby_password: '',
-    user_character: '',
+    host_username: '',
+    smash_lobby_id: '',
+    smash_lobby_password: '',
+    host_character: '',
     seeking_characters: [],
     created_time: new Date().toISOString(),
-    sessionId: '',
+    host_session_id: '',
     full: false,
   };
 
@@ -31,7 +31,7 @@ export class CreateComponent implements OnInit {
 
   ngOnInit() {
     // Retrieve session ID from local storage
-    this.lobby.sessionId = localStorage.getItem('sessionId') || '';
+    this.lobby.host_session_id = localStorage.getItem('sessionId') || '';
   }
 
   onAddSeekingCharacter() {
@@ -42,7 +42,7 @@ export class CreateComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.lobby.user_character && this.lobby.lobby_id && this.lobby.lobby_password && this.lobby.username) {
+    if (this.lobby.host_character && this.lobby.smash_lobby_id && this.lobby.smash_lobby_password && this.lobby.host_username) {
       this.lobby.id = this.generateId(); // Assign a unique ID
       this.lobbyService.createLobby(this.lobby).subscribe(
         () => this.router.navigate([`/lobby/${this.lobby.id}`]),

@@ -8,6 +8,10 @@
             <div class="message-username">{{ message.username }}</div>
             <div class="message-content">{{ message.content }}</div>
           </div>
+        } @else if (message.sender == 'System') {
+          <div class="message-system message-bubble">
+            <div class="message-content">{{ message.content }}</div>
+          </div>
         } @else {
           <div class="message-left message-bubble">
             <div class="message-username">{{ message.username }}</div>
@@ -34,21 +38,21 @@
       <input
         type="text"
         id="lobbyName"
-        [(ngModel)]="lobby.lobby_id"
+        [(ngModel)]="lobby.smash_lobby_id"
         placeholder="Lobby Name"
       />
       <label for="lobbyPassword">Lobby Password:</label>
       <input
         type="text"
         id="lobbyPassword"
-        [(ngModel)]="lobby.lobby_password"
+        [(ngModel)]="lobby.smash_lobby_password"
         placeholder="Lobby Password"
       />
       <label for="userCharacter">Your Character:</label>
       <input
         type="text"
         id="userCharacter"
-        [(ngModel)]="lobby.user_character"
+        [(ngModel)]="lobby.host_character"
         placeholder="Character"
       />
       <label for="newCharacter">Add Character:</label>
@@ -73,8 +77,8 @@
   } @else {
     <div class="side-panel">
       <h3>Lobby Information</h3>
-      <h4>Lobby ID: {{lobby.lobby_id}}</h4>
-      <h4>Lobby Password: {{lobby.lobby_password}}</h4>
+      <h4>Lobby ID: {{lobby.smash_lobby_id}}</h4>
+      <h4>Lobby Password: {{lobby.smash_lobby_password}}</h4>
     </div>
   }
 </div>

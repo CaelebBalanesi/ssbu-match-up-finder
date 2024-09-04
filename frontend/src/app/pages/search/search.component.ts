@@ -33,7 +33,9 @@ export class SearchComponent {
   }
 
   joinlobby(lobby_id: string) {
-    this.router.navigateByUrl(`/lobby/${lobby_id}`);
+    if (this.usernameChosen) {
+      this.router.navigateByUrl(`/lobby/${lobby_id}`);
+    }
   }
 
   setUsername() {

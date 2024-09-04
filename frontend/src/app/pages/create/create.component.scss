@@ -1,3 +1,4 @@
+/* HOME PAGE STYLES */
 body {
   height: 100vh;
   margin: 0;
@@ -76,6 +77,8 @@ ul {
   margin-top: 10px;
   padding-left: 20px;
   list-style-type: none;
+  max-height: 150px; /* Limit the height for scrolling */
+  overflow-y: auto; /* Make the character list scrollable */
 }
 
 ul li {
@@ -120,4 +123,35 @@ ul li {
   background-color: #ff00ff00;
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.25);
   outline: 2px solid #ff00ff;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+  .form-container {
+    max-width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  input[type="text"],
+  input[type="password"],
+  select {
+    padding: 10px;
+  }
+
+  .seeking-input {
+    flex-direction: column;
+  }
+
+  .seeking-input select {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  .btn, .addbtn {
+    padding: 10px;
+    font-size: 1em;
+  }
 }

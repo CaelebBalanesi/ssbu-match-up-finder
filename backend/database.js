@@ -5,15 +5,25 @@ db.serialize(() => {
   db.run(`
       CREATE TABLE IF NOT EXISTS lobbies (
         id TEXT PRIMARY KEY,
-        username TEXT NOT NULL,
-        lobby_id TEXT NOT NULL,
-        lobby_password TEXT NOT NULL,
-        user_character TEXT NOT NULL,
+        host_username TEXT NOT NULL,
+        host_session_id TEXT NOT NULL,
+        smash_lobby_id TEXT NOT NULL,
+        smash_lobby_password TEXT NOT NULL,
+        host_character TEXT NOT NULL,
         seeking_characters TEXT NOT NULL,
-        created_time TEXT NOT NULL,
-        sessionId TEXT NOT NULL
-      )
+        created_time TEXT NOT NULL
+        )
     `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS lobby_users (
+      lobby_id TEXT NOT NULL,
+      user_id TEXT NOT NULL,
+      username TEXT NOT NULL,
+      PRIMARY KEY (lobby_id, user_id),
+      FOREIGN KEY (lobby_id) REFERENCES lobbies(lobby_id)
+    );
+  `)
 });
 
 module.exports = db;

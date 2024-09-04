@@ -1,27 +1,29 @@
+/* General lobby room styles */
 .lobby-room {
   display: flex;
   justify-content: space-between;
-  padding: 20px;
-  background-color: #121212; /* Dark background for the lobby room */
-  color: #e0e0e0; /* Light text color for readability */
-  height: 100vh; /* Ensures the lobby takes the full height of the viewport */
+  background-color: #121212;
+  color: #e0e0e0;
+  height: 100vh;
+  flex-wrap: wrap; /* Allows wrapping for smaller screens */
+  overflow-y: hidden;
 }
 
 .chat-box {
   flex: 2;
   display: flex;
   flex-direction: column;
-  margin-right: 20px;
-  background-color: #222; /* Darker background for chat box */
+  margin: 20px;
+  background-color: #222;
   padding: 20px;
-  border-radius: 8px; /* Rounded corners for the chat box */
-  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
+  border-radius: 8px;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
   height: fit-content;
 }
 
 .chat-box h3 {
   margin-bottom: 10px;
-  color: #fff; /* White color for headings */
+  color: #fff;
 }
 
 .messages {
@@ -42,21 +44,26 @@
   padding: 10px 15px;
   border-radius: 20px;
   color: #fff;
-  word-wrap: break-word; /* Ensure long words break to the next line */
+  word-wrap: break-word;
   box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .message-right {
-  align-self: flex-end; /* Aligns message to the right */
-  background-color: #58ffac; /* Bubble color for your messages */
+  align-self: flex-end;
+  background-color: #58ffac;
   color: black;
-  border-bottom-right-radius: 0; /* Bubble arrow effect */
+  border-bottom-right-radius: 0;
 }
 
 .message-left {
-  align-self: flex-start; /* Aligns message to the left */
-  background-color: #444; /* Bubble color for others' messages */
-  border-bottom-left-radius: 0; /* Bubble arrow effect */
+  align-self: flex-start;
+  background-color: #444;
+  border-bottom-left-radius: 0;
+}
+
+.message-system {
+  align-self: center;
+  background-color: #585858;
 }
 
 .message-input {
@@ -69,57 +76,59 @@
   padding: 10px;
   font-size: 1em;
   margin-right: 10px;
-  background-color: #444; /* Dark background for the input field */
-  border: 1px solid #555; /* Border to define the input field */
+  background-color: #444;
+  border: 1px solid #555;
   border-radius: 20px;
-  color: #ddd; /* Light color for input text */
-  outline: none; /* Remove default outline */
+  color: #ddd;
+  outline: none;
 }
 
 .message-input input::placeholder {
-  color: #888; /* Lighter placeholder text */
+  color: #888;
 }
 
 .message-input input:focus {
-  background-color: #555; /* Slightly lighter on focus */
-  border-color: #666; /* Highlight border on focus */
+  background-color: #555;
+  border-color: #666;
 }
 
 .message-input button {
   padding: 10px 20px;
   font-size: 1em;
   cursor: pointer;
-  background-color: #58ffac; /* Consistent with other buttons */
+  background-color: #ff00ff;
   color: black;
   border: none;
-  border-radius: 20px; /* Rounded corners for buttons */
+  border-radius: 20px;
   transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
   outline: none;
-  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
 }
 
 .message-input button:hover, .message-input button:focus {
-  background-color: #58ffab00; /* Lighter blue on hover */
-  transform: translateY(-2px); /* Slight raise effect on hover */
-  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.25); /* Enhanced shadow on hover */
-  color: #58ffac;
-  outline: 2px solid #58ffac;
+  background-color: #ff00ff00;
+  transform: translateY(-2px);
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.25);
+  outline: 2px solid #ff00ff;
+  color: #ff00ff;
 }
 
 .side-panel {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background-color: #222; /* Darker background for control panel */
+  background-color: #222;
+  margin-right: 20px;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
   height: fit-content;
+  margin-top: 20px; /* Add margin to prevent overlap on smaller screens */
 }
 
 .side-panel h3 {
   margin-bottom: 10px;
-  color: #fff; /* White color for headings */
+  color: #fff;
 }
 
 .side-panel h4 {
@@ -129,11 +138,22 @@
 .side-panel label {
   margin-bottom: 5px;
   font-weight: bold;
-  color: #ccc; /* Light color for labels */
+  color: #ccc;
 }
 
 .side-panel input {
-  padding: 10px;
+  padding: 8px;
+  font-size: 1em;
+  margin-bottom: 10px;
+  background-color: #333; /* Darker background for input fields */
+  border: 1px solid #444; /* Darker border for inputs */
+  border-radius: 5px; /* Rounded corners for inputs */
+  color: #ddd; /* Light color for input text */
+  outline: none;
+}
+
+.side-panel select {
+  padding: 8px;
   font-size: 1em;
   margin-bottom: 10px;
   background-color: #333; /* Darker background for input fields */
@@ -144,100 +164,107 @@
 }
 
 .side-panel input::placeholder {
-  color: #888; /* Lighter placeholder text */
+  color: #888;
 }
 
 .side-panel input:focus {
-  background-color: #444; /* Slightly lighter on focus */
-  border-color: #555; /* Highlight border on focus */
+  background-color: #444;
+  border-color: #555;
 }
 
 .side-panel button {
   padding: 10px 20px;
   font-size: 1em;
   cursor: pointer;
-  background-color: #58ffac; /* Consistent with other buttons */
+  background-color: #00ffff;
   color: black;
   border: none;
-  border-radius: 8px; /* Rounded corners */
+  border-radius: 8px;
   transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
   outline: none;
-  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
   margin-bottom: 10px;
 }
 
-.side-panel button:hover {
-  background-color: #58ffab00; /* Lighter blue on hover */
-  transform: translateY(-2px); /* Slight raise effect on hover */
-  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.25); /* Enhanced shadow on hover */
-  outline: 2px solid #58ffac;
-  color: #58ffac;
+.side-panel button:hover, .side-panel button:focus {
+  background-color: #00ffff00;
+  transform: translateY(-2px);
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.25);
+  outline: 2px solid #00ffff;
+  color: #00ffff;
 }
 
 .side-panel ul {
-  list-style-type: none; /* Remove default list styling */
+  list-style-type: none;
   padding: 0;
-  width: 100%;
+  max-height: 250px;
+  overflow-y: auto;
 }
 
 .side-panel li {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #333; /* Dark background for list items */
+  background-color: #333;
   padding: 8px 10px;
-  margin-bottom: 5px;
+  margin-bottom: 12px;
   border-radius: 5px;
   border: 1px solid #444;
   color: #ddd;
 }
 
 .side-panel li button {
-  padding: 5px 10px; /* Smaller padding for a smaller button */
-  font-size: 0.8em; /* Smaller font size for text within the button */
-  background-color: #ff4b4b; /* Red color for emphasis on the remove action */
+  padding: 5px 10px;
+  font-size: 0.8em;
+  background-color: #ff4b4b;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.2s;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow for a 3D effect */
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
   outline: none;
 }
 
 .side-panel li button:hover, .side-panel li button:focus {
-  background-color: #ff2e2e; /* Darker shade of red on hover/focus */
-  transform: translateY(-1px); /* Slight raise effect on hover/focus */
+  background-color: #ff2e2e;
+  transform: translateY(-1px);
   box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
 }
 
-.select-container {
-  width: 100%;
-  display: flex;
-  align-items: center;
-}
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .lobby-room {
+    padding: 10px;
+  }
 
-select {
-  flex-grow: 1; /* Allow select to fill available space */
-  margin-right: 10px; /* Spacing between select and button */
-  background-color: #333;
-  color: #ddd;
-  border: 1px solid #444;
-  border-radius: 5px;
-  padding: 8px;
-  outline: none;
-}
+  .chat-box {
+    margin: 20px;
+    padding: 8px;
+    width: 100%;
+    height: fit-content;
+  }
 
-select:focus {
-  border-color: #555;
-}
+  .side-panel {
+    margin-top: 0;
+    width: 100%; /* Full width for the side panel on mobile */
+  }
 
-.message-right .message-username {
-  font-weight: bold;
-  color: #292929;
-}
+  .messages {
+    height: 250px; /* Reduce height for smaller screens */
+  }
 
-.message-left .message-username {
-  font-weight: bold;
-  color: #ccc;
+  .message-bubble {
+    max-width: 80%; /* Expand messages on smaller screens */
+  }
+
+  .message-input button, .side-panel button {
+    padding: 8px 16px;
+    font-size: 0.9em;
+  }
+
+  .side-panel input, .message-input input {
+    padding: 8px;
+    font-size: 0.9em;
+  }
 }

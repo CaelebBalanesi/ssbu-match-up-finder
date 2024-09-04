@@ -15,12 +15,12 @@
     <form (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label for="username">Your Name:</label>
-        <input type="text" id="username" [(ngModel)]="lobby.username" name="username" required>
+        <input type="text" id="username" [(ngModel)]="lobby.host_username" name="username" required>
       </div>
       
       <div class="form-group">
         <label for="user_character">Your Character:</label>
-        <select id="user_character" [(ngModel)]="lobby.user_character" name="user_character" required>
+        <select id="user_character" [(ngModel)]="lobby.host_character" name="user_character" required>
           @for (character of characterList; track $index) {
             <option>{{ character }}</option>
           }
@@ -46,12 +46,12 @@
   
       <div class="form-group">
         <label for="lobby_id">Lobby ID:</label>
-        <input type="text" id="lobby_id" [(ngModel)]="lobby.lobby_id" name="lobby_id" required>
+        <input type="text" id="lobby_id" [(ngModel)]="lobby.smash_lobby_id" name="lobby_id" required>
       </div>
   
       <div class="form-group">
         <label for="lobby_password">Lobby Password:</label>
-        <input type="password" id="lobby_password" [(ngModel)]="lobby.lobby_password" name="lobby_password" required>
+        <input type="password" id="lobby_password" [(ngModel)]="lobby.smash_lobby_password" name="lobby_password" required>
       </div>
   
       <button type="submit" class="btn">Create Lobby</button>

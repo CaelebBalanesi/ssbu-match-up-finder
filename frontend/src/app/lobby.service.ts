@@ -5,13 +5,13 @@ import { io, Socket } from 'socket.io-client'
 
 export interface Lobby {
   id: string;
-  username: string;
-  lobby_id: string;
-  lobby_password: string;
-  user_character: string;
+  host_username: string;
+  smash_lobby_id: string;
+  smash_lobby_password: string;
+  host_character: string;
   seeking_characters: string[];
   created_time: string;
-  sessionId: string;
+  host_session_id: string;
   full: boolean;
 }
 
@@ -103,7 +103,7 @@ export class LobbyService {
   }
 
   leaveLobby(): void {
-    this.socket.emit('disconnect');
+    this.socket.emit('disconnectFromLobby');
   }
 
   // Listen for messages from the lobby
@@ -111,6 +111,18 @@ export class LobbyService {
     return new Observable<Message>((observer) => {
       this.socket.on('message', (message: Message) => {
         observer.next(message);
+      });
+    });
+  }
+
+  onLobbyUpdate(): Observable<string> {
+    return new Observable<string>((observer) => {
+      this.socket.on('userJoined', (data) => {
+        observer.next(`${data.username} has joined the lobby`);
+      });
+
+      this.socket.on('userLeft', (data) => {
+        observer.next(`${data.username} has left the lobby`);
       });
     });
   }
