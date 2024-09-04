@@ -30,6 +30,7 @@ export class LobbyService {
   private socket: Socket;
   public lobbyFull = new Subject<boolean>();
   public joinedLobby = new Subject<any>();
+  public session_username = "";
   
   constructor(private http: HttpClient) {
     const sessionId = localStorage.getItem('sessionId');

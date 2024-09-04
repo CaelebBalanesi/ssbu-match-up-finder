@@ -1,5 +1,5 @@
 <body>
-    <div class="logo-container">
+  <div (click)="goHome()" class="logo-container">
     <svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" viewBox="0 0 320 240" preserveAspectRatio="xMidYMid meet">
         <!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit-->
         <g class="layer">
@@ -31,7 +31,7 @@
         <label for="seeking_character">Seeking Character:</label>
         <div class="seeking-input">
           <select id="seeking_character" [(ngModel)]="seekingCharacter" name="seeking_character">
-            @for (character of characterList; track $index) {
+            @for (character of characterList; track $index) { 
               <option>{{ character }}</option>
             }
           </select>

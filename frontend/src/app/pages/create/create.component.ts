@@ -51,6 +51,10 @@ export class CreateComponent implements OnInit {
     }
   }
 
+  goHome() {
+    this.router.navigateByUrl(``);
+  }
+
   private generateId(): string {
     return Math.random().toString(36).substring(2) + new Date().getTime().toString(36);
   }

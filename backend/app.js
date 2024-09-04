@@ -30,6 +30,14 @@ port = 3000;
 // Create a new lobby
 app.post('/lobbies', (req, res) => {
   const { id, username, lobby_id, lobby_password, user_character, seeking_characters, created_time, sessionId } = req.body;
+
+  console.log(`[NEW LOBBY](${id})
+  Created at: ${created_time}
+  Creator Name: ${username}
+  Creator Character: ${user_character}
+  Seeking: ${seeking_characters}
+  `);
+
   db.run(
     `INSERT INTO lobbies (id, username, lobby_id, lobby_password, user_character, seeking_characters, created_time, sessionId)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -38,7 +46,7 @@ app.post('/lobbies', (req, res) => {
       if (err) {
         return res.status(500).json({ error: err.message });
       }
-      lobbies[lobby_id] = { users: [], maxUsers: 2 }; // Initialize lobby with user tracking
+      lobbies[lobby_id] = { users: [], maxUsers: 2 };
       res.status(201).json({ id: this.lastID });
     }
   );
@@ -46,6 +54,7 @@ app.post('/lobbies', (req, res) => {
 
 // Get all lobbies
 app.get('/lobbies', (req, res) => {
+  console.log(`[LOBBY] Requested all lobbies`);
   db.all(`SELECT * FROM lobbies`, [], (err, rows) => {
     if (err) {
       return res.status(500).json({ error: err.message });
@@ -66,6 +75,7 @@ app.get('/lobbies', (req, res) => {
 // Get a single lobby by ID
 app.get('/lobbies/:id', (req, res) => {
   const { id } = req.params;
+  console.log(`[LOBBY] Requested Lobby ID: ${id}`);
   db.get(`SELECT * FROM lobbies WHERE id = ?`, [id], (err, row) => {
     if (err) {
       return res.status(500).json({ error: err.message });
@@ -88,6 +98,8 @@ app.get('/lobbies/:id', (req, res) => {
 app.put('/lobbies/:id', (req, res) => {
   const { id } = req.params;
   const { username, lobby_id, lobby_password, user_character, seeking_characters, created_time } = req.body;
+  console.log(`[LOBBY] Updated lobby ID: ${id}`);
+  console.log(req.body);
   db.run(
     `UPDATE lobbies
      SET username = ?, lobby_id = ?, lobby_password = ?, user_character = ?, seeking_characters = ?, created_time = ?
@@ -108,6 +120,7 @@ app.put('/lobbies/:id', (req, res) => {
 // Delete a lobby
 app.delete('/lobbies/:id', (req, res) => {
   const { id } = req.params;
+  console.log(`[LOBBY] Deleted lobby ID: ${id}`);
   db.run(`DELETE FROM lobbies WHERE id = ?`, [id], function (err) {
     if (err) {
       return res.status(500).json({ error: err.message });
@@ -128,16 +141,19 @@ io.on('connection', (socket) => {
     socket.emit('sessionId', sessionId);
   }
   socket.sessionId = sessionId;
+  console.log(`[CONNECTION] New session ID: ${sessionId}`);
 
   socket.on('joinLobby', (data) => {
     const { lobbyId, username } = data;
     const lobby = lobbies[lobbyId] || (lobbies[lobbyId] = { users: [], maxUsers: 2 });
 
     if (lobby.users.length >= lobby.maxUsers) {
-        socket.emit('lobbyFull', { message: 'This lobby is full.' });
-        return;
+      console.log(`[LOBBY FULL] ${username} rejected from lobby ID: ${lobbyId}`);
+      socket.emit('lobbyFull', { message: 'This lobby is full.' });
+      return;
     }
 
+    console.log(`[JOINED LOBBY] ${username} joined lobby ID: ${lobbyId}`);
     lobby.users.push({ userId: socket.id, username: username });
     socket.join(lobbyId);
 
@@ -150,6 +166,9 @@ io.on('connection', (socket) => {
 
   socket.on('message', (data) => {
     const { lobbyId, message, username } = data;
+    console.log(`[MESSAGE] Lobby ID: ${lobbyId}
+    ${username}: ${message}
+    `);
     io.to(lobbyId).emit('message', { lobbyId: lobbyId, content: message, username: username });
   });
 
@@ -159,10 +178,8 @@ io.on('connection', (socket) => {
         const index = lobby.users.findIndex(user => user.userId === socket.id);
         if (index !== -1) {
             const [user] = lobby.users.splice(index, 1);
+            console.log(`[DISCONNECT] ${user.username} left Lobby ID: ${lobby.id}`);
             socket.to(lobbyId).emit('userLeft', { userId: socket.id, username: user.username });
-            if (lobby.users.length === 0) {
-              delete lobbies[lobbyId]; // Optionally remove empty lobbies
-            }
         }
     });
   });

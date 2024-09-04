@@ -34,7 +34,7 @@ export class LobbyComponent {
   constructor(
     private lobbyService: LobbyService,
     private route: ActivatedRoute,
-    private router: Router,
+    private router: Router
   ) {
     this.censor = new TextCensor();
     this.matcher = new RegExpMatcher({
@@ -53,7 +53,7 @@ export class LobbyComponent {
           this.lobby = lobby;
           this.isCreator = this.checkIfCreator(lobby);
           if (!this.isCreator) {
-            this.username = prompt("Enter your username:") || "Anonymous";
+            this.username = this.lobbyService.session_username;
           } else {
             this.username = this.lobby.username;
           }

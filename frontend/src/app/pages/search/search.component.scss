@@ -41,6 +41,28 @@ body {
   color: #ccc;
 }
 
+.username-popup {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin-left: 50%;
+  margin-top: 50%;
+  transform: translate(-150px, -150px);
+  width: 300px;
+}
+
+.username-input {
+  width: 85%;
+  padding: 6px;
+  font-size: 1em;
+  margin-bottom: 10px;
+  background-color: #333;
+  border: 1px solid #444;
+  border-radius: 5px;
+  color: #ddd;
+  outline: none;
+}
+
 .search-form select {
   width: 85%;
   padding: 6px;
