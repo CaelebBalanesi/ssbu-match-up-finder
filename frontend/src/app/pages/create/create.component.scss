@@ -73,6 +73,18 @@ select:focus {
   margin-right: 10px;
 }
 
+.character-image-container {
+  display: flex;
+  justify-content: center;
+}
+
+.character-image {
+  margin: 0px;
+  margin-top: 8px;
+  width: 80px;
+  height: 80px;
+}
+
 ul {
   margin-top: 10px;
   padding-left: 20px;
@@ -125,15 +137,15 @@ ul li {
   outline: 2px solid #ff00ff;
 }
 
-.character-select img, .character-icons img {
+.character-icons img {
   width: 50px; /* Adjust size as needed */
   height: 50px; /* Adjust size as needed */
   margin-left: 10px; /* Spacing between select and image */
 }
 
 .character-icons {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* Limit to 4 icons per row */
   gap: 10px;
 }
 
@@ -174,5 +186,9 @@ ul li {
   .btn, .addbtn {
     padding: 10px;
     font-size: 1em;
+  }
+
+  .character-icons {
+    grid-template-columns: repeat(2, 1fr); /* Adjust to 2 per row on mobile */
   }
 }

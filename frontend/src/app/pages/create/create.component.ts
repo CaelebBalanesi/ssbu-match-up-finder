@@ -40,7 +40,9 @@ export class CreateComponent implements OnInit {
   }
 
   onAddSeekingCharacter() {
-    this.lobby.seeking_characters.push(this.characterList[this.seekingCharacterIndex]);
+    if (!this.lobby.seeking_characters.includes(this.characterList[this.seekingCharacterIndex])) {
+      this.lobby.seeking_characters.push(this.characterList[this.seekingCharacterIndex]);
+    }
   }
 
   removeSeekingCharacter(index: number) {

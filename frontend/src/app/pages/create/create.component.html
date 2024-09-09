@@ -26,7 +26,9 @@
               <option [value]="$index">{{ character.name }}</option>
             }
           </select>
-          <img [src]="lobby.host_character.image" alt="{{ lobby.host_character.name }}" class="character-image">
+          <div class="character-image-container">
+            <img [src]="lobby.host_character.image" alt="{{ lobby.host_character.name }}" class="character-image">
+          </div>
         </div>
       </div>
       
