@@ -125,6 +125,27 @@ ul li {
   outline: 2px solid #ff00ff;
 }
 
+.character-select img, .character-icons img {
+  width: 50px; /* Adjust size as needed */
+  height: 50px; /* Adjust size as needed */
+  margin-left: 10px; /* Spacing between select and image */
+}
+
+.character-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.character-icon {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.character-icon:hover {
+  transform: scale(1.1);
+}
+
 /* Mobile responsiveness */
 @media (max-width: 600px) {
   .form-container {

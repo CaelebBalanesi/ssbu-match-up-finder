@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { LobbyService, Lobby } from '../../lobby.service';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { CharacterNameImage, characters_data } from '../../character';
 
 @Component({
   selector: 'app-search',
@@ -11,12 +12,12 @@ import { Router } from '@angular/router';
   styleUrl: './search.component.scss'
 })
 export class SearchComponent {
-  userCharacter: string = '';
   lobbies: Lobby[] = [];
-  characterList: string[] = ['Mario', 'Donkey Kong', 'Link', 'Samus', 'Dark Samus', 'Yoshi', 'Kirby', 'Fox', 'Pikachu', 'Luigi', 'Ness', 'Captain Falcon', 'Jigglypuff', 'Peach', 'Daisy', 'Bowser', 'Ice Climbers', 'Sheik', 'Zelda', 'Dr.Mario', 'Pichu', 'Falco', 'Marth', 'Lucina', 'Young Link', 'Ganondorf', 'Mewtwo', 'Roy', 'Chrom', 'Mr. Game & Watch', 'Meta Knight', 'Pit', 'Dark Pit', 'Zero Suit Samus', 'Wario', 'Snake', 'Ike', 'Pokemon Trainer', 'Diddy Kong', 'Lucas', 'Sonic', 'King Dedede', 'Olimar', 'Lucario', 'R.O.B.', 'Toon Link', 'Wolf', 'Villager', 'Mega Man', 'Wii Fit Trainer', 'Rosalina & Luma', 'Little Mac', 'Greninja', 'Mii Brawler', 'Mii Gunner', 'Mii Swordfighter', 'Palutena', 'Pac-Man', 'Robin', 'Shulk', 'Bowser Jr.', 'Duck Hunt', 'Ryu', 'Ken', 'Cloud', 'Corrin', 'Bayonetta', 'Inkling', 'Ridley', 'Simon', 'Richter', 'King K. Rool', 'Isabelle', 'Incineroar', 'Piranha Plant', 'Joker', 'Hero', 'Banjo-Kazooie', 'Terry', 'Byleth', 'Min Min', 'Steve', 'Sephiroth', 'Pyra Mythra', 'Kazuya', 'Sora']; 
+  characterList: CharacterNameImage[] = characters_data; 
   setCharacter = false;
   username = "Anonymous";
   usernameChosen = false;
+  userCharacter: CharacterNameImage = this.characterList[0];
 
   constructor(private lobbyService: LobbyService, private router: Router) {}
 
@@ -47,4 +48,11 @@ export class SearchComponent {
   goHome() {
     this.router.navigateByUrl(``);
   }
+
+  ngOnInit() {
+    if (this.characterList.length > 0) {
+      this.userCharacter = this.characterList[0];
+    }
+  }
+  
 }

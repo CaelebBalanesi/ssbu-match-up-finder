@@ -20,29 +20,37 @@
       
       <div class="form-group">
         <label for="user_character">Your Character:</label>
-        <select id="user_character" [(ngModel)]="lobby.host_character" name="user_character" required>
-          @for (character of characterList; track $index) {
-            <option>{{ character }}</option>
-          }
-        </select>
+        <div class="character-select">
+          <select id="user_character" [(ngModel)]="selectedCharacterIndex" name="user_character" (change)="updateSelectedCharacter()" required>
+            @for (character of characterList; track $index) {
+              <option [value]="$index">{{ character.name }}</option>
+            }
+          </select>
+          <img [src]="lobby.host_character.image" alt="{{ lobby.host_character.name }}" class="character-image">
+        </div>
       </div>
-  
+      
       <div class="form-group">
         <label for="seeking_character">Seeking Character:</label>
         <div class="seeking-input">
-          <select id="seeking_character" [(ngModel)]="seekingCharacter" name="seeking_character">
-            @for (character of characterList; track $index) { 
-              <option>{{ character }}</option>
+          <select id="seeking_character" [(ngModel)]="seekingCharacterIndex" name="seeking_character">
+            @for (character of characterList; track $index) {
+              <option [value]="$index">{{ character.name }}</option>
             }
           </select>
           <button type="button" class="addbtn" (click)="onAddSeekingCharacter()">Add</button>
         </div>
-        <ul>
+        <div class="character-icons">
           @for (character of lobby.seeking_characters; track $index) {
-            <li>{{ character }}</li>
+            <img
+               [src]="character.image"
+               alt="{{ character.name }}"
+               class="character-icon"
+               (click)="removeSeekingCharacter($index)">
           }
-        </ul>
+        </div>
       </div>
+      
   
       <div class="form-group">
         <label for="lobby_id">Lobby ID:</label>

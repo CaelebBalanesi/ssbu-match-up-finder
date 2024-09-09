@@ -1,15 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
-import { io, Socket } from 'socket.io-client'
+import { io, Socket } from 'socket.io-client';
+import { CharacterNameImage, characters_data } from './character';
 
 export interface Lobby {
   id: string;
   host_username: string;
   smash_lobby_id: string;
   smash_lobby_password: string;
-  host_character: string;
-  seeking_characters: string[];
+  host_character: CharacterNameImage;
+  seeking_characters: CharacterNameImage[];
   created_time: string;
   host_session_id: string;
   full: boolean;
@@ -95,7 +96,7 @@ export class LobbyService {
 
   joinLobby(lobbyId: string, username: string): void {
     this.socket.emit('joinLobby', { lobbyId, username });
-}
+  }
 
   sendMessage(lobbyId: string, message: string, username: string): void {
     console.log(username);

@@ -24,9 +24,10 @@
       <label for="character">Your Character:</label>
         <select id="character" [(ngModel)]="userCharacter" name="character" required>
           @for (character of characterList; track $index) {
-            <option>{{ character }}</option>
+            <option [ngValue]="character">{{ character.name }}</option>
           }
         </select>
+      <img [src]="userCharacter.image">
       <button type="submit">Search Lobbies</button>
     </form>
 
