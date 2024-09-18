@@ -34,48 +34,57 @@
   @if (isCreator) {
     <div class="side-panel">
       <h3>Lobby Control Panel</h3>
-      <label for="lobbyName">Lobby Name:</label>
-      <input
-        type="text"
-        id="lobbyName"
-        [(ngModel)]="lobby.smash_lobby_id"
-        placeholder="Lobby Name"
-      />
-      <label for="lobbyPassword">Lobby Password:</label>
-      <input
-        type="text"
-        id="lobbyPassword"
-        [(ngModel)]="lobby.smash_lobby_password"
-        placeholder="Lobby Password"
-      />
-      <label for="userCharacter">Your Character:</label>
-      <input
-        type="text"
-        id="userCharacter"
-        [(ngModel)]="lobby.host_character"
-        placeholder="Character"
-      />
+      <div class="lobby-id-password">
+        <label for="lobbyName">Lobby ID and Password:</label><br>
+        <input
+          type="text"
+          id="lobbyIDandPassword"
+          [(ngModel)]="lobby.smash_lobby_id"
+          placeholder="Lobby Name"
+        />
+        <input
+          type="text"
+          id="lobbyIDandPassword"
+          [(ngModel)]="lobby.smash_lobby_password"
+          placeholder="Lobby Password"
+        />
+      </div>
+      <label for="hostCharacter">Current Character:</label>
+      <div class="host-character-container">
+        <img [src]="this.lobby.host_character.image" class="host-character-icon"/>
+        <select class="host-character-select" id="hostCharacter" [(ngModel)]="newHostCharacterIndex" name="hostCharacter">
+          @for (character of characterList; track $index) {
+            <option [value]="$index">{{ character.name }}</option>
+          }
+        </select>
+        <button (click)="newHostCharacter()">Change Character</button>
+      </div>
+      
       <label for="newCharacter">Add Character:</label>
-      <select id="newCharacter" [(ngModel)]="newSeekingCharacter" name="newCharacter">
-        @for (character of characterList; track $index) {
-          <option>{{ character.name }}</option>
-        }
-      </select>
-      <button (click)="addSeekingCharacter()">Add Character</button>
+      <div class="new-character-container">
+        <select id="newCharacter" [(ngModel)]="newSeekingCharacterIndex" name="newCharacter">
+          @for (character of characterList; track $index) {
+            <option [value]="$index">{{ character.name }}</option>
+          }
+        </select>
+        <button (click)="addSeekingCharacter()">Add Character</button>
+      </div>
     
       <h4>Current Characters:</h4>
       <div class="character-icons">
         @for (character of lobby.seeking_characters; track $index) {
           <ng-container>
             <img src="{{ character.image }}" 
-                 alt="{{ character }}" 
+                 alt="{{ character.name }}" 
                  class="character-icon"
                  (click)="removeSeekingCharacter($index)" />
           </ng-container>
         }
       </div>
-      <button (click)="updateLobby()">Update Lobby</button>
-      <button (click)="shutdownLobby()">Shutdown Lobby</button>
+      <div class="control-panel-buttons">
+        <button (click)="updateLobby()">Update Lobby</button>
+        <button (click)="shutdownLobby()">Shutdown Lobby</button>
+      </div>
     </div>
   } @else {
     <div class="side-panel">

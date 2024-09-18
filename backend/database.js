@@ -14,16 +14,6 @@ db.serialize(() => {
         created_time TEXT NOT NULL
         )
     `);
-
-  db.run(`
-    CREATE TABLE IF NOT EXISTS lobby_users (
-      lobby_id TEXT NOT NULL,
-      user_id TEXT NOT NULL,
-      username TEXT NOT NULL,
-      PRIMARY KEY (lobby_id, user_id),
-      FOREIGN KEY (lobby_id) REFERENCES lobbies(lobby_id)
-    );
-  `)
 });
 
 module.exports = db;

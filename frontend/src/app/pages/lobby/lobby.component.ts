@@ -28,6 +28,8 @@ export class LobbyComponent {
   private sessionId!: string;
   characterList: CharacterNameImage[] = characters_data;
   newSeekingCharacter!: CharacterNameImage;
+  newSeekingCharacterIndex!: number;
+  newHostCharacterIndex!: number;
   username: string = '';
   private censor: TextCensor;
   private matcher: RegExpMatcher;
@@ -78,10 +80,8 @@ export class LobbyComponent {
 
       this.lobbyService.joinedLobby.subscribe((data) => {
         console.log('Successfully joined lobby:', data);
-        // Update the UI based on successful join
       });
 
-      // Subscribe to incoming messages
       this.messageSubscription = this.lobbyService.onMessage().subscribe(
         (message: Message) => {
           this.messages.push(message);
@@ -139,8 +139,13 @@ export class LobbyComponent {
     }
   }
 
+  newHostCharacter(): void {
+    this.lobby.host_character = characters_data[this.newHostCharacterIndex];
+  }
+
   addSeekingCharacter(): void {
-    if (!this.lobby.seeking_characters.includes(this.newSeekingCharacter)) {
+    this.newSeekingCharacter = characters_data[this.newSeekingCharacterIndex];
+    if (!this.lobby.seeking_characters.some((character) => character.name === this.newSeekingCharacter.name)) {
       this.lobby.seeking_characters.push(this.newSeekingCharacter);
       this.updateLobby();
     }

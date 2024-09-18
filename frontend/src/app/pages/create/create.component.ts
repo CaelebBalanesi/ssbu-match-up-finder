@@ -33,7 +33,6 @@ export class CreateComponent implements OnInit {
   constructor(private lobbyService: LobbyService, private router: Router) {}
 
   ngOnInit() {
-    // Retrieve session ID from local storage
     this.lobby.host_session_id = localStorage.getItem('sessionId') || '';
     this.lobby.host_character = this.characterList[this.selectedCharacterIndex];
     this.seekingCharacter = this.characterList[this.seekingCharacterIndex];

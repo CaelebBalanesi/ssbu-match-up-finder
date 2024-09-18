@@ -7,6 +7,7 @@ const db = require('./database');
 const cookieParser = require('cookie-parser');
 const uuid = require('uuid');
 
+// Create server and sockets
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -18,16 +19,16 @@ const io = new Server(server, {
   transports: ['websocket', 'polling']
 });
 
+// Lobbies object to store lobby user count
 const lobbies = {};
 
+// Middleware
 app.use(bodyParser.json());
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
-port = 3000;
-
-// Create a new lobby
+// Create a new Lobby
 app.post('/lobbies', (req, res) => {
   // Pull data into variables from request body
   const { id, host_username, host_session_id, smash_lobby_id, smash_lobby_password, host_character, seeking_characters, created_time } = req.body;
@@ -35,14 +36,12 @@ app.post('/lobbies', (req, res) => {
   db.run(
     `INSERT INTO lobbies (id, host_username, host_session_id, smash_lobby_id, smash_lobby_password, host_character, seeking_characters, created_time)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [id, host_username, host_session_id, smash_lobby_id, smash_lobby_password, host_character, JSON.stringify(seeking_characters), created_time],
+    [id, host_username, host_session_id, smash_lobby_id, smash_lobby_password, JSON.stringify(host_character), JSON.stringify(seeking_characters), created_time],
     function (err) {
-      if (err) {
-        // Log error creating lobby to console.
+      if (err) {  
         console.log(`[NEW LOBBY](ERROR) ${err.message}`);
         return res.status(500).json({ error: err.message });
       }
-      // Log new lobby to console.
       console.log(`[NEW LOBBY](${id})
       Created at: ${created_time}
       Creator Name: ${host_username}
@@ -60,12 +59,15 @@ app.post('/lobbies', (req, res) => {
 // Get all lobbies
 app.get('/lobbies', (req, res) => {
   console.log(`[LOBBY] Requested all lobbies`);
+  // Query database for all lobbies
   db.all(`SELECT * FROM lobbies`, [], (err, rows) => {
     if (err) {
+      console.log(`[LOBBY](ERROR) ${err.message}`);
       return res.status(500).json({ error: err.message });
     }
     res.json(rows.map(row => {
       const lobbyId = row.id;
+      // Create lobby entry if it doesn't exist
       if (!lobbies[lobbyId]) {
         lobbies[lobbyId] = { users: [], maxUsers: 2 };
       }
@@ -73,6 +75,7 @@ app.get('/lobbies', (req, res) => {
       const isFull = lobbies[lobbyId].users.length >= 2;
       return {
         ...row,
+        host_character: JSON.parse(row.host_character),
         seeking_characters: JSON.parse(row.seeking_characters),
         full: isFull
       };
@@ -96,6 +99,7 @@ app.get('/lobbies/:id', (req, res) => {
     const isFull = lobbies[id].users.length >= 2;
     res.json({
       ...row,
+      host_character: JSON.parse(row.host_character),
       seeking_characters: JSON.parse(row.seeking_characters),
       full: isFull
     });
@@ -112,7 +116,7 @@ app.put('/lobbies/:id', (req, res) => {
     `UPDATE lobbies
      SET host_username = ?, smash_lobby_id = ?, smash_lobby_password = ?, host_character = ?, seeking_characters = ?, created_time = ?
      WHERE id = ?`,
-    [host_username, smash_lobby_id, smash_lobby_password, host_character, JSON.stringify(seeking_characters), created_time, id],
+    [host_username, smash_lobby_id, smash_lobby_password, JSON.stringify(host_character), JSON.stringify(seeking_characters), created_time, id],
     function (err) {
       if (err) {
         return res.status(500).json({ error: err.message });
@@ -194,6 +198,7 @@ io.on('connection', (socket) => {
   });
 });
 
+port = 3000;
 server.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });

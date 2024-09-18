@@ -40,7 +40,7 @@
         @for (lobby of lobbies; track $index) {
             <li>
                 {{ lobby.host_username }}'s lobby - Character: {{
-                  lobby.host_character
+                  lobby.host_character.name
                 }}
                 <button (click)="joinlobby(lobby.id);">Join</button>
             </li>
