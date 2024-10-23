@@ -1,6 +1,5 @@
 backend/node_modules
 backend/package-lock.json
-backend/lobbies.db
-lobbies.db
 frontend/environments
 backend/.env
+backend/database.db

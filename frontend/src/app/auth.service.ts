@@ -8,7 +8,7 @@ import { environment } from '../environments/enviroment';
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = environment.apiUrl + "/api";
+  private apiUrl = environment.apiUrl + "/auth";
   private tokenKey = 'authToken';
   private usernameKey = 'Username';
 
