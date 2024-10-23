@@ -8,7 +8,7 @@
             <div class="message-username">{{ message.username }}</div>
             <div class="message-content">{{ message.content }}</div>
           </div>
-        } @else if (message.sender == 'System') {
+        } @else if (message.sender == "System") {
           <div class="message-system message-bubble">
             <div class="message-content">{{ message.content }}</div>
           </div>
@@ -34,53 +34,75 @@
   @if (isCreator) {
     <div class="side-panel">
       <h3>Lobby Control Panel</h3>
+
       <div class="lobby-id-password">
-        <label for="lobbyName">Lobby ID and Password:</label><br>
-        <input
-          type="text"
-          id="lobbyIDandPassword"
-          [(ngModel)]="lobby.smash_lobby_id"
-          placeholder="Lobby Name"
-        />
-        <input
-          type="text"
-          id="lobbyIDandPassword"
-          [(ngModel)]="lobby.smash_lobby_password"
-          placeholder="Lobby Password"
-        />
+        <div class="form-group">
+          <label for="lobbyID">Lobby ID:</label>
+          <input
+            type="text"
+            id="lobbyID"
+            [(ngModel)]="lobby.smash_lobby_id"
+            placeholder="Lobby ID"
+          />
+        </div>
+        <div class="form-group">
+          <label for="lobbyPassword">Lobby Password:</label>
+          <input
+            type="text"
+            id="lobbyPassword"
+            [(ngModel)]="lobby.smash_lobby_password"
+            placeholder="Lobby Password"
+          />
+        </div>
       </div>
-      <label for="hostCharacter">Current Character:</label>
-      <div class="host-character-container">
-        <img [src]="this.lobby.host_character.image" class="host-character-icon"/>
-        <select class="host-character-select" id="hostCharacter" [(ngModel)]="newHostCharacterIndex" name="hostCharacter">
-          @for (character of characterList; track $index) {
-            <option [value]="$index">{{ character.name }}</option>
-          }
-        </select>
-        <button (click)="newHostCharacter()">Change Character</button>
+
+      <div class="form-group">
+        <label for="hostCharacter">Current Character:</label>
+        <div class="host-character-container">
+          <img [src]="lobby.host_character.image" class="host-character-icon" />
+          <select
+            class="host-character-select"
+            id="hostCharacter"
+            [(ngModel)]="newHostCharacterIndex"
+            name="hostCharacter"
+          >
+            @for (character of characterList; track $index) {
+              <option [value]="$index">{{ character.name }}</option>
+            }
+          </select>
+        </div>
       </div>
-      
-      <label for="newCharacter">Add Character:</label>
-      <div class="new-character-container">
-        <select id="newCharacter" [(ngModel)]="newSeekingCharacterIndex" name="newCharacter">
-          @for (character of characterList; track $index) {
-            <option [value]="$index">{{ character.name }}</option>
-          }
-        </select>
-        <button (click)="addSeekingCharacter()">Add Character</button>
+
+      <div class="form-group">
+        <label for="newCharacter">Add Character:</label>
+        <div class="new-character-container">
+          <select
+            id="newCharacter"
+            [(ngModel)]="newSeekingCharacterIndex"
+            name="newCharacter"
+          >
+            @for (character of characterList; track $index) {
+              <option [value]="$index">{{ character.name }}</option>
+            }
+          </select>
+          <button (click)="addSeekingCharacter()">Add Character</button>
+        </div>
       </div>
-    
+
       <h4>Current Characters:</h4>
       <div class="character-icons">
         @for (character of lobby.seeking_characters; track $index) {
           <ng-container>
-            <img src="{{ character.image }}" 
-                 alt="{{ character.name }}" 
-                 class="character-icon"
-                 (click)="removeSeekingCharacter($index)" />
+            <img
+              src="{{ character.image }}"
+              alt="{{ character.name }}"
+              class="character-icon"
+              (click)="removeSeekingCharacter($index)"
+            />
           </ng-container>
         }
       </div>
+
       <div class="control-panel-buttons">
         <button (click)="updateLobby()">Update Lobby</button>
         <button (click)="shutdownLobby()">Shutdown Lobby</button>
@@ -89,8 +111,8 @@
   } @else {
     <div class="side-panel">
       <h3>Lobby Information</h3>
-      <h4>Lobby ID: {{lobby.smash_lobby_id}}</h4>
-      <h4>Lobby Password: {{lobby.smash_lobby_password}}</h4>
+      <h4>Lobby ID: {{ lobby.smash_lobby_id }}</h4>
+      <h4>Lobby Password: {{ lobby.smash_lobby_password }}</h4>
     </div>
   }
 </div>

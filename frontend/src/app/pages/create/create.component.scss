@@ -5,15 +5,9 @@ body {
   flex-direction: column;
   justify-content: normal;
   align-items: center;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
   background-color: #121212;
   color: #e0e0e0;
-}
-
-.logo-container {
-  width: 100%;
-  max-width: 300px;
-  height: auto;
 }
 
 .form-container {
@@ -105,12 +99,16 @@ ul li {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+  transition:
+    background-color 0.3s,
+    transform 0.2s,
+    box-shadow 0.3s;
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
   outline: none;
 }
 
-.btn:hover, .btn:focus {
+.btn:hover,
+.btn:focus {
   color: #00ffff;
   background-color: #00ffff00;
   transform: translateY(-2px);
@@ -126,10 +124,14 @@ ul li {
   background-color: #ff00ff;
   color: black;
   padding: 12px;
-  transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+  transition:
+    background-color 0.3s,
+    transform 0.2s,
+    box-shadow 0.3s;
 }
 
-.addbtn:hover, .addbtn:focus {
+.addbtn:hover,
+.addbtn:focus {
   color: #ff00ff;
   background-color: #ff00ff00;
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.25);
@@ -157,6 +159,38 @@ ul li {
   transform: scale(1.1);
 }
 
+.login-overlay {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  margin: 12px;
+}
+
+.logout-button {
+  border-radius: 8px;
+  border: none;
+  background-color: #ff0000;
+  transition:
+    background-color 0.3s,
+    transform 0.2s,
+    box-shadow 0.3s;
+  width: 72px;
+  height: 40px;
+  font-size: 12px;
+  padding: 0px;
+  margin-left: 8px;
+  outline: none;
+}
+
+.logout-button:hover,
+.login-button:focus {
+  background-color: #ff00ff00;
+  outline: 2px solid #ff0000;
+  color: #ff0000;
+  transform: translateY(-2px);
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.25);
+}
+
 /* Mobile responsiveness */
 @media (max-width: 600px) {
   .form-container {
@@ -182,7 +216,8 @@ ul li {
     margin-bottom: 10px;
   }
 
-  .btn, .addbtn {
+  .btn,
+  .addbtn {
     padding: 10px;
     font-size: 1em;
   }

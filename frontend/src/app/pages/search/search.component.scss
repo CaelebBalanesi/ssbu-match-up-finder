@@ -5,21 +5,15 @@ body {
   flex-direction: column;
   justify-content: normal;
   align-items: center;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
   background-color: #121212;
   color: #e0e0e0;
 }
 
-img {
+.character-icon {
   width: 120px;
   height: 120px;
   margin-bottom: 12px;
-}
-
-.logo-container {
-  width: 100%;
-  max-width: 300px;
-  height: auto;
 }
 
 .search-container {
@@ -47,17 +41,7 @@ img {
   color: #ccc;
 }
 
-.username-popup {
-  position: absolute;
-  left: 0;
-  top: 0;
-  margin-left: 50%;
-  margin-top: 50%;
-  transform: translate(-150px, -150px);
-  width: 300px;
-}
-
-.username-input, .search-form select {
+.search-form select {
   width: 85%;
   padding: 6px;
   font-size: 1em;
@@ -82,12 +66,16 @@ img {
   color: black;
   border: none;
   border-radius: 8px;
-  transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  transition:
+    background-color 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
   outline: none;
 }
 
-.search-form button:hover, .search-form button:focus {
+.search-form button:hover,
+.search-form button:focus {
   background-color: #00ffff00;
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.25);
   outline: 2px solid #ff00ff;
@@ -133,11 +121,14 @@ img {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s, box-shadow 0.3s;
+  transition:
+    background-color 0.3s,
+    box-shadow 0.3s;
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
 }
 
-.lobby-list li button:hover, .lobby-list li button:focus {
+.lobby-list li button:hover,
+.lobby-list li button:focus {
   background-color: #00ffff00;
   outline: 2px solid #00ffff;
   color: #00ffff;
@@ -149,20 +140,52 @@ img {
   color: #888;
 }
 
+.login-overlay {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  margin: 12px;
+}
+
+.logout-button {
+  border-radius: 8px;
+  border: none;
+  background-color: #ff0000;
+  transition:
+    background-color 0.3s,
+    transform 0.2s,
+    box-shadow 0.3s;
+  width: 72px;
+  height: 40px;
+  font-size: 12px;
+  padding: 0px;
+  margin-left: 8px;
+  outline: none;
+}
+
+.logout-button:hover,
+.login-button:focus {
+  background-color: #ff00ff00;
+  outline: 2px solid #ff0000;
+  color: #ff0000;
+  transform: translateY(-2px);
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.25);
+}
+
 /* Mobile responsiveness */
 @media (max-width: 600px) {
   .search-container {
     margin-top: 20px;
     width: 90%;
   }
-  
+
   .search-form {
     width: 100%;
     padding: 15px;
     box-shadow: none;
     margin-bottom: 15px;
   }
-  
+
   .lobby-list {
     max-height: 200px;
   }

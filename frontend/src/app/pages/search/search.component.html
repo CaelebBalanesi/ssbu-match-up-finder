@@ -1,57 +1,47 @@
 <body>
-  <div (click)="goHome()" class="logo-container">
-    <svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" viewBox="0 0 320 240" preserveAspectRatio="xMidYMid meet">
-        <!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit-->
-        <g class="layer">
-            <title>Layer 1</title>
-            <text fill="#00ffff" font-family="Fantasy" font-size="12" id="svg_4" stroke="#000000" stroke-width="0" text-anchor="middle" transform="matrix(15.0793 0 0 15.0793 -1602.73 -3196.57)" x="116.51" xml:space="preserve" y="226.65">SU</text>
-            <text fill="#ff00ff" font-family="Fantasy" font-size="12" id="svg_5" stroke="#000000" stroke-width="0" text-anchor="middle" transform="matrix(15.0793 0 0 15.0793 -1592.73 -3197.6)" x="116.77" xml:space="preserve" y="225.72">SU</text>
-            <text fill="#000000" font-family="Fantasy" font-size="12" id="svg_6" stroke="#000000" stroke-width="0" text-anchor="middle" transform="matrix(15.0793 0 0 15.0793 -1600.73 -3194.6)" x="116.84" xml:space="preserve" y="225.92">SU</text>
-        </g>
-    </svg>
+  <div class="login-overlay">
+    <p>
+      Logged in as {{ username
+      }}<button class="logout-button" (click)="logout()">Logout</button>
+    </p>
   </div>
-  @if (setCharacter && !usernameChosen) {
-    <div class="username-popup">
-      <form (ngSubmit)="setUsername()" class="search-form">
-        <label for="username">Your Username:</label>
-        <input [(ngModel)]="username" class="username-input" name="username" id="username">
-        <button type="submit">Set Username</button>
-      </form>
-    </div>
-  }
-<div class="search-container">
+  <div (click)="goHome()" class="logo-container">
+    <img src="Logo.png" alt="Logo" />
+  </div>
+  <div class="search-container">
     <form (ngSubmit)="searchLobbies()" class="search-form">
       <label for="character">Your Character:</label>
-        <select id="character" [(ngModel)]="userCharacter" name="character" required>
-          @for (character of characterList; track $index) {
-            <option [ngValue]="character">{{ character.name }}</option>
-          }
-        </select>
-      <img [src]="userCharacter.image">
+      <select
+        id="character"
+        [(ngModel)]="userCharacter"
+        name="character"
+        required
+      >
+        @for (character of characterList; track $index) {
+          <option [ngValue]="character">{{ character.name }}</option>
+        }
+      </select>
+      <img class="character-icon" [src]="userCharacter.image" />
       <button type="submit">Search Lobbies</button>
     </form>
 
-    @if (
-        lobbies.length > 0
-    ) {
-    <div class="lobby-list">
-      <h3>Available Lobbies:</h3>
-      <ul>
-        @for (lobby of lobbies; track $index) {
+    @if (lobbies.length > 0) {
+      <div class="lobby-list">
+        <h3>Available Lobbies:</h3>
+        <ul>
+          @for (lobby of lobbies; track $index) {
             <li>
-                {{ lobby.host_username }}'s lobby - Character: {{
-                  lobby.host_character.name
-                }}
-                <button (click)="joinlobby(lobby.id);">Join</button>
+              {{ lobby.host_username }}'s lobby - Character:
+              {{ lobby.host_character.name }}
+              <button (click)="joinlobby(lobby.id)">Join</button>
             </li>
-        }
-      </ul>
-    </div>
+          }
+        </ul>
+      </div>
     } @else {
-        <div class="no-lobbies">
-            <p>No lobbies found.</p>
-        </div>
+      <div class="no-lobbies">
+        <p>No lobbies found.</p>
+      </div>
     }
-</div>
-  
+  </div>
 </body>

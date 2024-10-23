@@ -39,10 +39,10 @@
 }
 
 .message-bubble {
-  max-width: 60%;
+  max-width: 60%;u
   padding: 10px 15px;
   border-radius: 20px;
-  color: #fff;
+  color: #000000;
   word-wrap: break-word;
   box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
 }
@@ -56,7 +56,7 @@
 
 .message-left {
   align-self: flex-start;
-  background-color: #00FFFF;
+  background-color: #00ffff;
   border-bottom-left-radius: 0;
 }
 
@@ -93,7 +93,6 @@
 }
 
 .message-input button {
-  width: 100px;
   padding: 8px 12px;
   font-size: 0.9em;
   cursor: pointer;
@@ -101,12 +100,15 @@
   color: black;
   border: none;
   border-radius: 20px;
-  transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+  transition:
+    background-color 0.3s,
+    transform 0.2s,
+    box-shadow 0.3s;
   outline: none;
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
 }
 
-.message-input button:hover, 
+.message-input button:hover,
 .message-input button:focus {
   background-color: #ff00ff00;
   transform: translateY(-2px);
@@ -133,14 +135,14 @@
   color: #fff;
 }
 
-.side-panel h4, 
+.side-panel h4,
 .side-panel label {
   margin-bottom: 10px;
   color: #ccc;
 }
 
 /* Input and select fields */
-.side-panel input, 
+.side-panel input,
 .side-panel select {
   padding: 8px;
   font-size: 1em;
@@ -149,7 +151,6 @@
   border-radius: 5px;
   color: #ddd;
   outline: none;
-  margin-right: 10px;
   flex: 1;
 }
 
@@ -157,19 +158,24 @@
   color: #888;
 }
 
-.side-panel input:focus, 
+.side-panel input:focus,
 .side-panel select:focus {
   background-color: #444;
   border-color: #555;
 }
 
-.side-panel .form-group {
+.form-group {
   display: flex;
   align-items: center;
+  margin-bottom: 15px;
+  gap: 10px;
+}
+
+.form-group label {
+  min-width: 120px;
 }
 
 .side-panel button {
-  width: 100px;
   padding: 8px 12px;
   font-size: 0.9em;
   cursor: pointer;
@@ -177,16 +183,21 @@
   color: black;
   border: none;
   border-radius: 8px;
-  transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+  transition:
+    background-color 0.3s,
+    transform 0.2s,
+    box-shadow 0.3s;
   outline: none;
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
 }
 
-.contol-panel-buttons {
-  width: 200px;
+.control-panel-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
 }
 
-.side-panel button:hover, 
+.side-panel button:hover,
 .side-panel button:focus {
   background-color: #00ffff00;
   transform: translateY(-2px);
@@ -198,7 +209,9 @@
 .character-icon {
   width: 80px;
   height: 80px;
+  cursor: pointer;
 }
+
 .host-character-icon {
   width: 40px;
   height: 40px;
@@ -207,13 +220,24 @@
 .host-character-container {
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
+  gap: 10px;
 }
 
 .new-character-container {
-  display:flex;
+  display: flex;
   align-items: center;
-  margin-bottom: 8px;
+  gap: 10px;
+}
+
+.character-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  transition: all 0.2s ease-out;
+}
+
+.character-icon:hover {
+  transform: scale(1.1);
 }
 
 /* Mobile responsiveness */
@@ -222,7 +246,7 @@
     padding: 10px;
   }
 
-  .chat-box, 
+  .chat-box,
   .side-panel {
     width: 100%;
     margin-top: 0;
@@ -236,16 +260,24 @@
     max-width: 80%;
   }
 
-  .message-input button, 
+  .message-input button,
   .side-panel button {
     padding: 8px 16px;
     font-size: 0.9em;
-    width: 90px;
   }
 
-  .side-panel input, 
+  .side-panel input,
   .message-input input {
     padding: 8px;
     font-size: 0.9em;
+  }
+
+  .form-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .form-group label {
+    margin-bottom: 5px;
   }
 }
