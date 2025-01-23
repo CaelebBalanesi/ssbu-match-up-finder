@@ -1,0 +1,44 @@
+@if (loggedIn) {
+  <div class="profile-content">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Profile</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="character-selector">
+          <mat-label>Select your main character</mat-label>
+          <mat-select [(value)]="mainCharacter">
+            @for (character of characters; track $index) {
+              <mat-option [value]="character.name">
+                <img
+                  [src]="character.image"
+                  alt="{{ character.name }}"
+                  class="character-icon"
+                />
+                {{ character.name }}
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        @if (!mainSet) {
+          <p class="warning">
+            You need to set your main to search or create lobbies.
+          </p>
+        }
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-flat-button color="primary" (click)="updateMainCharacter()">
+          Update Main
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+} @else {
+  <div class="profile-content" *ngIf="!loggedIn">
+    <mat-card>
+      <mat-card-content>
+        <p>Please log in to access your profile.</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+}
