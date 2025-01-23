@@ -1,0 +1,123 @@
+@import "../colors.scss";
+
+.mat-toolbar {
+  background-color: #393137;
+  color: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  width: 300px;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  width: 300px;
+  justify-content: end;
+}
+
+.profile {
+  display: grid;
+  grid-template: 1fr / 1fr;
+  place-items: center;
+  color: #ffb109;
+  width: fit-content;
+}
+
+.profile > * {
+  grid-column: 1 / 1;
+  grid-row: 1 / 1;
+}
+
+.profile span {
+  background-color: #ff6262;
+  color: #540000;
+}
+
+.logo {
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+}
+
+.avatar {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  margin-right: 8px;
+  border: 2.5px solid #e0e0e0;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.profile mat-icon {
+  position: relative;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffb109;
+  height: 46px;
+  width: 46px;
+  font-size: 36px;
+  opacity: 0;
+  line-height: 1.2;
+  transition: all 0.2s;
+}
+
+.profile:hover mat-icon {
+  opacity: 1;
+}
+
+.profile:hover .avatar {
+  opacity: 0;
+}
+
+.menu-button {
+  font-size: 40px;
+  width: 46px;
+  height: 46px;
+  margin-right: 8px;
+}
+
+.menu-button mat-icon {
+  height: 46px;
+  width: 46px;
+  font-size: 36px;
+  line-height: 1.25;
+  position: relative;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(0deg);
+  transition: all ease-in-out 0.2s;
+}
+
+.menu-button:hover mat-icon {
+  transform: translate(-50%, -50%) rotate(180deg);
+}
+
+mat-sidenav-container {
+  height: 100vh;
+}
+
+mat-sidenav {
+  width: 250px;
+  background-color: #1c1c1c;
+  color: #e0e0e0;
+  margin-top: 12px;
+}
+
+a mat-icon {
+  line-height: 1.2;
+  margin-right: 6px;
+}
+
+a {
+  display: flex;
+  align-items: center;
+}

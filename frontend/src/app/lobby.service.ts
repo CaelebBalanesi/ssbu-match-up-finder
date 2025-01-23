@@ -1,11 +1,10 @@
+// lobby.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, Subject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { CharacterNameImage } from './character';
-import { AuthService } from '../app/auth.service';
-import { Router } from '@angular/router';
-import { environment } from '../environments/enviroment';
+import { environment } from '../environments/environment';
 
 export interface Lobby {
   id: string;
@@ -22,6 +21,16 @@ export interface Message {
   content: string;
   sender: string;
   username: string;
+  avatarURL: string;
+}
+
+interface User {
+  id: string;
+  username: string;
+  discriminator: string;
+  avatar: string;
+  email: string;
+  mfa_enabled: boolean;
 }
 
 @Injectable({
@@ -32,102 +41,100 @@ export class LobbyService {
   private socket: Socket;
   public lobbyFull = new Subject<boolean>();
   public joinedLobby = new Subject<any>();
-  public session_username = '';
+  private userData$ = new BehaviorSubject<User | null>(null);
 
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService,
-    private router: Router,
-  ) {
-    // lobby.service.ts (modify socket initialization)
+  constructor(private http: HttpClient) {
     this.socket = io(environment.apiUrl, {
-      auth: {
-        token: this.authService.getToken(),
-      },
+      withCredentials: true,
       transports: ['websocket', 'polling'],
     });
 
     this.socket.on('connect', () => {
-      console.log('Connected to WebSocket server');
-    });
-
-    this.socket.on('sessionId', (newSessionId: string) => {
-      console.log(`SessionId: ${newSessionId}`);
-      localStorage.setItem('sessionId', newSessionId);
+      console.log('Socket connected:', this.socket.id);
     });
 
     this.socket.on('connect_error', (error) => {
-      console.error('Connection Error:', error);
+      console.error('Socket connection error:', error);
     });
 
-    this.socket.on('lobbyFull', () => {
-      console.log('Lobby is full');
-      this.lobbyFull.next(true);
+    this.socket.on('userData', (user: User) => {
+      this.userData$.next(user);
+      console.log('Received user data from Socket.IO:', user);
     });
 
-    this.socket.on('joinedLobby', (data) => {
-      console.log('Joined lobby:', data.lobbyId);
-      this.joinedLobby.next(data);
+    this.socket.on('unauthorized', () => {
+      console.warn('Socket.IO connection unauthorized');
+      this.userData$.next(null);
+    });
+
+    this.socket.on('error', (error) => {
+      console.error('Socket.IO error:', error);
     });
   }
 
-  ngOnInit() {
-    if (!this.authService.isAuthenticated()) {
-      this.router.navigate(['/login']);
-    }
+  getUserData(): Observable<User | null> {
+    return this.userData$.asObservable();
   }
 
-  // Get all lobbies
+  // HTTP methods without custom headers
   getLobbies(): Observable<Lobby[]> {
-    const headers = this.getAuthHeaders();
-    return this.http.get<Lobby[]>(this.apiUrl, { headers });
+    return this.http.get<Lobby[]>(this.apiUrl, { withCredentials: true });
   }
 
-  // Get a single lobby by ID
   getLobby(id: string): Observable<Lobby> {
-    const headers = this.getAuthHeaders();
     const url = `${this.apiUrl}/${id}`;
-    return this.http.get<Lobby>(url, { headers });
+    return this.http.get<Lobby>(url, { withCredentials: true });
   }
 
-  // Create a new lobby
-  createLobby(lobby: Lobby): Observable<Lobby> {
-    const headers = this.getAuthHeaders();
-    return this.http.post<Lobby>(this.apiUrl, lobby, { headers });
+  updateLobby(lobbyId: string, lobby: Lobby) {
+    this.socket.emit('updateLobby', { lobbyId, lobby: lobby });
   }
 
-  // Update an existing lobby
-  updateLobby(id: string, lobby: Lobby): Observable<any> {
-    const url = `${this.apiUrl}/${id}`;
-    const headers = this.getAuthHeaders();
-    return this.http.put(url, lobby, { headers });
-  }
-
-  // Delete a lobby
   deleteLobby(id: string): Observable<any> {
     const url = `${this.apiUrl}/${id}`;
-    const headers = this.getAuthHeaders();
-    return this.http.delete(url, { headers });
+    return this.http.delete(url, { withCredentials: true });
   }
 
-  joinLobby(lobbyId: string, username: string): void {
-    this.socket.emit('joinLobby', { lobbyId, username });
+  createLobby(lobby: Lobby): Observable<Lobby> {
+    console.log(lobby);
+    return this.http.post<Lobby>(this.apiUrl, lobby, { withCredentials: true });
   }
 
-  sendMessage(lobbyId: string, message: string, username: string): void {
-    console.log(username);
-    this.socket.emit('message', { lobbyId, message, username });
+  amountOfLobbies(): Observable<any> {
+    const url = `${environment.apiUrl}/stats/amount`;
+    return this.http.get<any>(url, { withCredentials: true });
+  }
+
+  // Socket.IO methods without username parameter
+  joinLobby(lobbyId: string): void {
+    this.socket.emit('joinLobby', { lobbyId });
+  }
+
+  sendMessage(lobbyId: string, message: string, avatarURL: string): void {
+    console.log(
+      `Emitting message to server - LobbyID: ${lobbyId}, Message: ${message}, AvatarURL: ${avatarURL}`,
+    );
+    this.socket.emit('message', { lobbyId, message, avatarURL });
   }
 
   leaveLobby(): void {
-    this.socket.emit('disconnectFromLobby');
+    this.socket.emit('leaveLobby');
   }
 
-  // Listen for messages from the lobby
+  // Socket event listeners
   onMessage(): Observable<Message> {
     return new Observable<Message>((observer) => {
       this.socket.on('message', (message: Message) => {
+        console.log('Received message from server:', message);
         observer.next(message);
+      });
+    });
+  }
+
+  onLobbyChanges(): Observable<Lobby> {
+    return new Observable<Lobby>((observer) => {
+      this.socket.on('updateLobby', (data) => {
+        observer.next(data.lobby);
       });
     });
   }
@@ -144,11 +151,11 @@ export class LobbyService {
     });
   }
 
-  private getAuthHeaders(): HttpHeaders {
-    const token = this.authService.getToken();
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+  onLobbyClosed(): Observable<string> {
+    return new Observable<string>((observer) => {
+      this.socket.on('lobbyClosed', (data) => {
+        observer.next(data.message);
+      });
     });
   }
 }

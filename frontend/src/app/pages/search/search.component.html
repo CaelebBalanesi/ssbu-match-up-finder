@@ -1,47 +1,55 @@
-<body>
-  <div class="login-overlay">
-    <p>
-      Logged in as {{ username
-      }}<button class="logout-button" (click)="logout()">Logout</button>
-    </p>
-  </div>
-  <div (click)="goHome()" class="logo-container">
-    <img src="Logo.png" alt="Logo" />
-  </div>
-  <div class="search-container">
-    <form (ngSubmit)="searchLobbies()" class="search-form">
-      <label for="character">Your Character:</label>
-      <select
-        id="character"
-        [(ngModel)]="userCharacter"
-        name="character"
-        required
-      >
-        @for (character of characterList; track $index) {
-          <option [ngValue]="character">{{ character.name }}</option>
-        }
-      </select>
-      <img class="character-icon" [src]="userCharacter.image" />
-      <button type="submit">Search Lobbies</button>
-    </form>
-
-    @if (lobbies.length > 0) {
-      <div class="lobby-list">
-        <h3>Available Lobbies:</h3>
-        <ul>
-          @for (lobby of lobbies; track $index) {
-            <li>
-              {{ lobby.host_username }}'s lobby - Character:
-              {{ lobby.host_character.name }}
-              <button (click)="joinlobby(lobby.id)">Join</button>
-            </li>
-          }
-        </ul>
+<div class="search-container">
+  @if (lobbies.length > 0 && mainSet) {
+    <div>
+      <mat-card class="lobby-list">
+        <mat-card-title>Available Lobbies:</mat-card-title>
+        <mat-card-content>
+          <mat-list>
+            @for (lobby of lobbies; track $index) {
+              <mat-list-item>
+                <div>
+                  <img [src]="lobby.host_character.image" />
+                  <p>{{ lobby.host_username }}'s lobby</p>
+                  <button
+                    mat-flat-button
+                    color="accent"
+                    (click)="joinLobby(lobby.id)"
+                  >
+                    Join
+                  </button>
+                </div>
+              </mat-list-item>
+              <mat-divider></mat-divider>
+            }
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  } @else {
+    @if (mainSet) {
+      <div class="no-lobbies">
+        <p>No lobbies found.</p>
+        <button
+          class="reset-button"
+          mat-flat-button
+          color="primary"
+          (click)="reset()"
+        >
+          Search Again
+        </button>
       </div>
     } @else {
       <div class="no-lobbies">
-        <p>No lobbies found.</p>
+        <p class="warning">You must set your main in your profile!</p>
+        <button
+          class="reset-button"
+          mat-flat-button
+          color="primary"
+          (click)="goToProfile()"
+        >
+          Go to Profile
+        </button>
       </div>
     }
-  </div>
-</body>
+  }
+</div>

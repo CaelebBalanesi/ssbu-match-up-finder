@@ -1,8 +1,14 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  OnDestroy,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LobbyService, Lobby, Message } from '../../lobby.service';
 import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import {
   RegExpMatcher,
   TextCensor,
@@ -11,123 +17,240 @@ import {
 } from 'obscenity';
 import { CharacterNameImage, characters_data } from '../../character';
 import { AuthService } from '../../auth.service';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatCardModule } from '@angular/material/card';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+
+interface User {
+  id: string;
+  username: string;
+  discriminator: string;
+  avatar: string;
+  email: string;
+  mfa_enabled: boolean;
+}
 
 @Component({
   selector: 'app-lobby',
   standalone: true,
-  imports: [FormsModule],
+  imports: [
+    FormsModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatCardModule,
+    MatSnackBarModule,
+  ],
   templateUrl: './lobby.component.html',
   styleUrls: ['./lobby.component.scss'],
 })
-export class LobbyComponent implements OnInit {
-  lobby!: Lobby;
+export class LobbyComponent implements OnInit, OnDestroy {
+  lobby: Lobby = {
+    id: '',
+    host_username: '',
+    smash_lobby_id: '',
+    smash_lobby_password: '',
+    host_character: characters_data[0],
+    seeking_characters: [],
+    created_time: new Date().toISOString(),
+    full: false,
+  };
+
   messages: Message[] = [];
   newMessage: string = '';
   isCreator: boolean = false;
   private messageSubscription!: Subscription;
   private lobbySubscription!: Subscription;
+  private lobbyChangesSubscription!: Subscription;
   characterList: CharacterNameImage[] = characters_data;
-  newSeekingCharacter!: CharacterNameImage;
-  newSeekingCharacterIndex!: number;
-  newHostCharacterIndex!: number;
-  username: string = '';
+  newSeekingCharacterIndex: number = 0;
+  newHostCharacterIndex: number = 0;
+  username: string | null = '';
   private censor: TextCensor;
   private matcher: RegExpMatcher;
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
+  lobbyClosedSubscription!: Subscription;
+  private authSubscription!: Subscription;
+  unsavedChanges: boolean = false;
+  authenticated$: Observable<boolean>;
+  user$: Observable<User | null>;
+  avatarUrl: string | null = null;
+  id: string | null = null;
+  new_lobby_id: string = '';
+  new_lobby_password: string = '';
 
   constructor(
     private lobbyService: LobbyService,
     private route: ActivatedRoute,
     private router: Router,
     private auth: AuthService,
+    private snackbar: MatSnackBar,
   ) {
     this.censor = new TextCensor();
     this.matcher = new RegExpMatcher({
       ...englishDataset.build(),
       ...englishRecommendedTransformers,
     });
+    this.authenticated$ = this.auth.isAuthenticated();
+    this.user$ = this.auth.getUserInfo();
   }
 
   ngOnInit(): void {
-    if (!this.auth.isAuthenticated()) {
-      this.router.navigate(['/login']);
-      return;
+    this.auth.checkAuthStatus().subscribe(
+      (status) => {
+        if (status.authenticated && status.user) {
+          this.avatarUrl = `https://cdn.discordapp.com/avatars/${status.user.id}/${status.user.avatar}.png`;
+          this.username = `${status.user.username}`;
+          this.lobby.host_username = this.username;
+          this.id = status.user.id;
+          this.initializeLobby();
+        } else {
+          this.avatarUrl = null;
+          this.username = null;
+          this.id = null;
+          this.auth.login();
+        }
+      },
+      (error) => {
+        console.error('Error fetching authentication status:', error);
+        this.auth.login();
+      },
+    );
+
+    window.onbeforeunload = () => this.ngOnDestroy();
+  }
+
+  ngOnChanges(): void {
+    if (this.new_lobby_id != this.lobby.smash_lobby_id) {
+      this.unsavedChanges = true;
     }
 
-    this.username = this.auth.getUsername();
+    if (this.new_lobby_password != this.lobby.smash_lobby_password) {
+      this.unsavedChanges = true;
+    }
+  }
+
+  private initializeLobby(): void {
     const id = this.route.snapshot.paramMap.get('id');
 
     if (id) {
       this.lobbyService.getLobby(id).subscribe(
         (lobby: Lobby) => {
           this.lobby = lobby;
+          console.log(this.lobby);
           this.isCreator = this.checkIfCreator(lobby);
-          this.username = this.auth.getUsername();
-          console.log(`Joining lobby: ${this.lobby.id}`);
-          this.lobbyService.joinLobby(this.lobby.id, this.username);
-          console.log(this.lobby.full);
+          this.lobbyService.joinLobby(this.lobby.id);
+          this.subscribeToMessages();
+          this.subscribeToLobbyUpdates();
+          this.new_lobby_id = lobby.smash_lobby_id;
+          this.new_lobby_password = lobby.smash_lobby_password;
         },
         (error: any) => {
-          this.router.navigateByUrl(`/`);
+          this.router.navigateByUrl('/');
           console.error(error);
         },
       );
 
       this.lobbyService.lobbyFull.subscribe((isFull) => {
         if (isFull) {
-          this.router.navigateByUrl(`/search`);
-          alert('Lobby is full');
+          this.router.navigateByUrl('/search');
+          this.snackbar.open('Lobby is Full', 'Close', {
+            duration: 3000,
+          });
         }
       });
 
-      this.lobbyService.joinedLobby.subscribe((data) => {
-        console.log('Successfully joined lobby:', data);
-      });
+      this.lobbyClosedSubscription = this.lobbyService
+        .onLobbyClosed()
+        .subscribe(
+          (message: string) => {
+            this.snackbar.open(message, 'Close', {
+              duration: 3000,
+            });
+            this.router.navigate(['/']);
+          },
+          (error) =>
+            console.error('Error receiving lobby closed event:', error),
+        );
 
-      this.messageSubscription = this.lobbyService.onMessage().subscribe(
-        (message: Message) => {
-          this.messages.push(message);
-          this.scrollToBottom();
-          console.log('New message received:', message);
-        },
-        (error) => console.error('Error receiving messages:', error),
-      );
-
-      this.lobbySubscription = this.lobbyService.onLobbyUpdate().subscribe(
-        (update: string) => {
-          let lobbyMessage: Message = {
-            username: 'System',
-            sender: 'System',
-            content: update,
-          };
-          this.messages.push(lobbyMessage);
-          this.scrollToBottom();
-        },
-        (error) => console.error('Error receiving updates:', error),
-      );
+      this.lobbyChangesSubscription = this.lobbyService
+        .onLobbyChanges()
+        .subscribe(
+          (lobby: Lobby) => {
+            this.lobby = lobby;
+            this.snackbar.open('Lobby Updated', 'Close', {
+              duration: 3000,
+            });
+            this.unsavedChanges = false;
+          },
+          (error) => console.error('Error:', error),
+        );
     }
+  }
 
-    window.onbeforeunload = () => this.ngOnDestroy();
+  private subscribeToMessages(): void {
+    this.messageSubscription = this.lobbyService.onMessage().subscribe(
+      (message: Message) => {
+        this.messages.push(message);
+        console.log(message.avatarURL);
+        this.scrollToBottom();
+      },
+      (error) => console.error('Error receiving messages:', error),
+    );
+  }
+
+  private subscribeToLobbyUpdates(): void {
+    this.lobbySubscription = this.lobbyService.onLobbyUpdate().subscribe(
+      (update: string) => {
+        let lobbyMessage: Message = {
+          username: 'System',
+          sender: 'System',
+          content: update,
+          avatarURL: '',
+        };
+        this.messages.push(lobbyMessage);
+        this.scrollToBottom();
+      },
+      (error) => console.error('Error receiving updates:', error),
+    );
   }
 
   sendMessage(): void {
-    if (this.newMessage.trim()) {
-      let matches = this.matcher.getAllMatches(this.newMessage);
+    if (this.newMessage.trim() && this.lobby && this.avatarUrl) {
+      console.log(`[MESSAGE] "${this.newMessage}"`);
+      const matches = this.matcher.getAllMatches(this.newMessage);
+      const sanitizedMessage = this.censor.applyTo(this.newMessage, matches);
       this.lobbyService.sendMessage(
         this.lobby.id,
-        this.censor.applyTo(this.newMessage, matches),
-        this.username,
+        sanitizedMessage,
+        this.avatarUrl,
       );
       this.newMessage = '';
+      this.scrollToBottom();
+    } else if (!this.lobby) {
+      alert('You are no longer in the lobby.');
     }
+    this.scrollToBottom();
   }
 
   updateLobby(): void {
-    this.lobby.host_character = characters_data[this.newHostCharacterIndex];
-    this.lobbyService.updateLobby(this.lobby.id, this.lobby).subscribe(
-      () => alert('Lobby updated successfully'),
-      (error: any) => console.error(error),
-    );
+    this.lobby.smash_lobby_password = this.new_lobby_password;
+    this.lobby.smash_lobby_id = this.new_lobby_id;
+    this.lobby.host_character = this.characterList[this.newHostCharacterIndex];
+    this.lobbyService.updateLobby(this.lobby.id, this.lobby);
+  }
+
+  updateHostCharacter(): void {
+    this.unsavedChanges = true;
+    this.lobby.host_character = this.characterList[this.newHostCharacterIndex];
   }
 
   private checkIfCreator(lobby: Lobby): boolean {
@@ -142,7 +265,7 @@ export class LobbyComponent implements OnInit {
     if (this.isCreator) {
       this.lobbyService.deleteLobby(this.lobby.id).subscribe(
         () => {
-          this.router.navigateByUrl(`/`);
+          this.router.navigateByUrl('/');
         },
         (error: any) => console.error(error),
       );
@@ -150,46 +273,54 @@ export class LobbyComponent implements OnInit {
   }
 
   addSeekingCharacter(): void {
-    this.newSeekingCharacter = characters_data[this.newSeekingCharacterIndex];
+    const newCharacter = this.characterList[this.newSeekingCharacterIndex];
     if (
       !this.lobby.seeking_characters.some(
-        (character) => character.name === this.newSeekingCharacter.name,
+        (character) => character.name === newCharacter.name,
       )
     ) {
-      this.lobby.seeking_characters.push(this.newSeekingCharacter);
-      this.updateLobby();
+      this.lobby.seeking_characters.push(newCharacter);
     }
+    this.unsavedChanges = true;
   }
 
   removeSeekingCharacter(index: number): void {
     this.lobby.seeking_characters.splice(index, 1);
-    this.updateLobby();
+    this.unsavedChanges = true;
   }
 
   ngOnDestroy(): void {
+    this.lobbyService.leaveLobby();
+
     if (this.messageSubscription) {
       this.messageSubscription.unsubscribe();
     }
     if (this.lobbySubscription) {
       this.lobbySubscription.unsubscribe();
     }
-
-    if (this.isCreator) {
-      this.lobbyService.deleteLobby(this.lobby.id).subscribe(
-        () => {},
-        (error: any) => console.error(error),
-      );
-    } else {
-      this.lobbyService.leaveLobby();
+    if (this.lobbyClosedSubscription) {
+      this.lobbyClosedSubscription.unsubscribe();
+    }
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
     }
   }
 
   private scrollToBottom(): void {
-    try {
-      this.messagesContainer.nativeElement.scrollTop =
-        this.messagesContainer.nativeElement.scrollHeight;
-    } catch (err) {
-      console.error('Failed to scroll to bottom:', err);
-    }
+    setTimeout(() => {
+      this.messagesContainer.nativeElement.scroll({
+        top: this.messagesContainer.nativeElement.scrollHeight,
+        left: 0,
+        behavior: 'smooth',
+      });
+    }, 0);
+  }
+
+  goHome() {
+    this.router.navigateByUrl('');
+  }
+
+  logout() {
+    this.auth.logout();
   }
 }

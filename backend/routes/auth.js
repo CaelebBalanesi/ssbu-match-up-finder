@@ -1,83 +1,52 @@
 // routes/auth.js
 const express = require("express");
 const router = express.Router();
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const db = require("../database");
+const passport = require("passport");
+const config = require("../config"); // Ensure config is imported
 
-// User registration
-router.post("/register", (req, res) => {
-  const { username, password } = req.body;
+// Discord Authentication Route
+router.get("/discord", passport.authenticate("discord"));
 
-  // Validate input
-  if (!username || !password) {
-    return res
-      .status(400)
-      .json({ error: "Username and password are required" });
-  }
-
-  // Hash the password
-  bcrypt.hash(password, 10, (err, hashedPassword) => {
-    if (err) {
-      console.error("Error hashing password", err);
-      return res.status(500).json({ error: "Server error" });
-    }
-
-    // Store user in the database
-    const query = `INSERT INTO users (username, password) VALUES (?, ?)`;
-    db.run(query, [username, hashedPassword], function (err) {
+// Discord Callback Route
+router.get(
+  "/discord/callback",
+  passport.authenticate("discord", {
+    failureRedirect: "/auth/failed",
+  }),
+  (req, res, next) => {
+    console.log(`[AUTHENTICATED] User: ${req.user.username}`);
+    req.session.save((err) => {
       if (err) {
-        if (err.code === "SQLITE_CONSTRAINT") {
-          return res.status(409).json({ error: "Username already exists" });
-        }
-        console.error("Error inserting user", err);
-        return res.status(500).json({ error: "Server error" });
+        console.error("Session save error:", err);
+        return next(err);
       }
-      res.status(201).json({ message: "User registered successfully" });
+      res.redirect(`${config.CORS_ORIGIN}/auth/success`);
     });
-  });
+  },
+);
+
+// Authentication Failure Route
+router.get("/auth/failed", (req, res) => {
+  res.status(401).send("Authentication Failed");
 });
 
-// User login
-router.post("/login", (req, res) => {
-  const { username, password } = req.body;
-
-  // Validate input
-  if (!username || !password) {
-    return res
-      .status(400)
-      .json({ error: "Username and password are required" });
+// Authentication Status Route
+router.get("/status", (req, res) => {
+  console.log("Session ID:", req.sessionID);
+  console.log("Session Data:", req.session);
+  console.log("User:", req.user);
+  console.log("Authenticated:", req.isAuthenticated());
+  if (req.isAuthenticated()) {
+    res.json({ authenticated: true, user: req.user });
+  } else {
+    res.json({ authenticated: false });
   }
+});
 
-  // Retrieve user from the database
-  const query = `SELECT * FROM users WHERE username = ?`;
-  db.get(query, [username], (err, user) => {
-    if (err) {
-      console.error("Error fetching user", err);
-      return res.status(500).json({ error: "Server error" });
-    }
-    if (!user) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
-
-    // Compare passwords
-    bcrypt.compare(password, user.password, (err, isMatch) => {
-      if (err) {
-        console.error("Error comparing passwords", err);
-        return res.status(500).json({ error: "Server error" });
-      }
-      if (!isMatch) {
-        return res.status(401).json({ error: "Invalid credentials" });
-      }
-
-      // Generate JWT
-      const token = jwt.sign(
-        { userId: user.id, username: user.username },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" },
-      );
-      res.json({ token });
-    });
+// Logout Route
+router.get("/logout", (req, res) => {
+  req.logout(() => {
+    res.redirect(`${config.CORS_ORIGIN}/`);
   });
 });
 

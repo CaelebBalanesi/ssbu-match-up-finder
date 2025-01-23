@@ -1,20 +1,36 @@
 // routes/lobbies.js
 const express = require("express");
 const router = express.Router();
-const authenticateToken = require("../middleware/authenticateToken");
 const Lobby = require("../models/Lobby");
 
 // In-memory lobbies object
 const lobbies = {};
 
+// Simple Middleware to check for Authentication
+function isAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    console.log(`[AUTHENTICATED] User: ${req.user.username}`);
+    return next();
+  }
+  console.log(`[UNAUTHORIZED] Attempted access by unauthenticated user`);
+  res.status(401).json({ error: "Unauthorized" });
+}
+
 // Create a new Lobby
-router.post("/", authenticateToken, (req, res) => {
+router.post("/", isAuthenticated, (req, res) => {
   const {
     smash_lobby_id,
     smash_lobby_password,
     host_character,
     seeking_characters,
-  } = req.body;
+  } = req.body || {};
+
+  // Validate required fields
+  if (!smash_lobby_id || !smash_lobby_password || !host_character) {
+    console.log(`[ERROR] Missing required lobby fields`);
+    return res.status(400).json({ error: "Missing required lobby fields" });
+  }
+
   const host_username = req.user.username;
 
   // Create lobby instance
@@ -28,19 +44,14 @@ router.post("/", authenticateToken, (req, res) => {
 
   lobbies[lobby.id] = lobby;
 
-  console.log(`[NEW LOBBY](${lobby.id})
-Created at: ${lobby.created_time}
-Creator Name: ${host_username}
-Creator Character: ${host_character}
-Seeking: ${JSON.stringify(seeking_characters)}
-`);
+  console.log(`[NEW LOBBY](${lobby.id}) Host: ${lobby.host_username}`);
 
   res.status(201).json({ id: lobby.id });
 });
 
 // Get all lobbies
-router.get("/", authenticateToken, (req, res) => {
-  console.log(`[LOBBY] Requested all lobbies`);
+router.get("/", isAuthenticated, (req, res) => {
+  console.log(`[LIST LOBBIES] User: ${req.user.username}`);
   const lobbyList = Object.values(lobbies).map((lobby) => {
     const isFull = lobby.users.length >= lobby.maxUsers;
     return {
@@ -48,66 +59,102 @@ router.get("/", authenticateToken, (req, res) => {
       full: isFull,
     };
   });
+  console.log(`[LOBBY LIST RESPONSE] Total Lobbies: ${lobbyList.length}`);
   res.json(lobbyList);
 });
 
 // Get a single lobby by ID
-router.get("/:id", (req, res) => {
+router.get("/:id", isAuthenticated, (req, res) => {
   const { id } = req.params;
-  console.log(`[LOBBY] Requested Lobby ID: ${id}`);
+  console.log(`[REQUEST LOBBY] Lobby ID: ${id}`);
+
   const lobby = lobbies[id];
   if (!lobby) {
+    console.log(`[ERROR] Lobby not found: Lobby ID: ${id}`);
     return res.status(404).json({ error: "Lobby not found" });
   }
   const isFull = lobby.users.length >= lobby.maxUsers;
-  res.json({
+  const response = {
     ...lobby,
     full: isFull,
-  });
+  };
+  console.log(
+    `[LOBBY DETAILS RESPONSE] Lobby ID: ${id}, Data: ${JSON.stringify(response)}`,
+  );
+  res.json(response);
 });
 
 // Update a lobby
-router.put("/:id", authenticateToken, (req, res) => {
+router.put("/:id", isAuthenticated, (req, res) => {
   const { id } = req.params;
   const {
     smash_lobby_id,
     smash_lobby_password,
     host_character,
     seeking_characters,
-  } = req.body;
+  } = req.body || {}; // Default to empty object
+
   const lobby = lobbies[id];
+  console.log(
+    `[LOBBY UPDATE REQUEST] Lobby ID: ${id}, User: ${req.user.username}`,
+  );
+
   if (!lobby) {
+    console.log(`[ERROR] Lobby not found: Lobby ID: ${id}`);
     return res.status(404).json({ error: "Lobby not found" });
   }
   if (lobby.host_username !== req.user.username) {
+    console.log(
+      `[UNAUTHORIZED] User: ${req.user.username} is not the host of Lobby ID: ${id}`,
+    );
     return res
       .status(403)
       .json({ error: "You are not the host of this lobby" });
   }
+
+  // Validate required fields
+  if (!smash_lobby_id || !smash_lobby_password || !host_character) {
+    console.log(`[ERROR] Missing required lobby fields for update`);
+    return res.status(400).json({ error: "Missing required lobby fields" });
+  }
+
   lobby.smash_lobby_id = smash_lobby_id;
   lobby.smash_lobby_password = smash_lobby_password;
   lobby.host_character = host_character;
   lobby.seeking_characters = seeking_characters;
   lobby.created_time = new Date().toISOString();
 
-  console.log(`[LOBBY] Updated lobby ID: ${id}`);
+  console.log(
+    `[LOBBY UPDATED] Lobby ID: ${id}, New Data: ${JSON.stringify(lobby)}`,
+  );
   res.json({ message: "Lobby updated" });
 });
 
 // Delete a lobby
-router.delete("/:id", authenticateToken, (req, res) => {
+router.delete("/:id", isAuthenticated, (req, res) => {
   const { id } = req.params;
   const lobby = lobbies[id];
+  console.log(
+    `[LOBBY DELETE REQUEST] Lobby ID: ${id}, User: ${req.user.username}`,
+  );
+
   if (!lobby) {
+    console.log(`[ERROR] Lobby not found: Lobby ID: ${id}`);
     return res.status(404).json({ error: "Lobby not found" });
   }
+
   if (lobby.host_username !== req.user.username) {
+    console.log(
+      `[UNAUTHORIZED] User: ${req.user.username} is not the host of Lobby ID: ${id}`,
+    );
     return res
       .status(403)
       .json({ error: "You are not the host of this lobby" });
   }
   delete lobbies[id];
-  console.log(`[LOBBY] Deleted lobby ID: ${id}`);
+  console.log(
+    `[LOBBY DELETED] Lobby ID: ${id} has been deleted by User: ${req.user.username}`,
+  );
   res.json({ message: "Lobby deleted" });
 });
 

@@ -20,14 +20,9 @@ const characters_data: CharacterNameImage[] = [
       'https://firebasestorage.googleapis.com/v0/b/ssbu-matchup.appspot.com/o/Link.webp?alt=media',
   },
   {
-    name: 'Samus',
+    name: 'Samus/Dark Samus',
     image:
       'https://firebasestorage.googleapis.com/v0/b/ssbu-matchup.appspot.com/o/Samus.webp?alt=media',
-  },
-  {
-    name: 'Dark Samus',
-    image:
-      'https://firebasestorage.googleapis.com/v0/b/ssbu-matchup.appspot.com/o/Dark%20Samus.webp?alt=media',
   },
   {
     name: 'Yoshi',
@@ -70,14 +65,9 @@ const characters_data: CharacterNameImage[] = [
       'https://firebasestorage.googleapis.com/v0/b/ssbu-matchup.appspot.com/o/Jigglypuff.webp?alt=media',
   },
   {
-    name: 'Peach',
+    name: 'Peach/Daisy',
     image:
       'https://firebasestorage.googleapis.com/v0/b/ssbu-matchup.appspot.com/o/Peach.webp?alt=media',
-  },
-  {
-    name: 'Daisy',
-    image:
-      'https://firebasestorage.googleapis.com/v0/b/ssbu-matchup.appspot.com/o/Daisy.webp?alt=media',
   },
   {
     name: 'Bowser',
@@ -350,14 +340,9 @@ const characters_data: CharacterNameImage[] = [
       'https://firebasestorage.googleapis.com/v0/b/ssbu-matchup.appspot.com/o/Ridley.png?alt=media',
   },
   {
-    name: 'Simon',
+    name: 'Simon/Richter',
     image:
       'https://firebasestorage.googleapis.com/v0/b/ssbu-matchup.appspot.com/o/Simon.webp?alt=media',
-  },
-  {
-    name: 'Richter',
-    image:
-      'https://firebasestorage.googleapis.com/v0/b/ssbu-matchup.appspot.com/o/Richter.webp?alt=media',
   },
   {
     name: 'King K. Rool',
@@ -435,5 +420,11 @@ const characters_data: CharacterNameImage[] = [
       'https://firebasestorage.googleapis.com/v0/b/ssbu-matchup.appspot.com/o/Sora.webp?alt=media',
   },
 ];
+
+characters_data.sort(function (a, b) {
+  var textA = a.name.toUpperCase();
+  var textB = b.name.toUpperCase();
+  return textA < textB ? -1 : textA > textB ? 1 : 0;
+});
 
 export { characters_data };

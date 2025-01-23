@@ -1,95 +1,91 @@
-<body>
-  <div class="login-overlay">
-    <p>
-      Logged in as {{ username
-      }}<button class="logout-button" (click)="logout()">Logout</button>
-    </p>
-  </div>
-  <div (click)="goHome()" class="logo-container">
-    <img src="Logo.png" />
-  </div>
-  <div class="form-container">
-    <h2>Create a Lobby</h2>
-    <form (ngSubmit)="onSubmit()">
-      <div class="form-group">
-        <label for="user_character">Your Character:</label>
-        <div class="character-select">
-          <select
-            id="user_character"
-            [(ngModel)]="selectedCharacterIndex"
-            name="user_character"
-            (change)="updateSelectedCharacter()"
-            required
-          >
-            @for (character of characterList; track $index) {
-              <option [value]="$index">{{ character.name }}</option>
-            }
-          </select>
-          <div class="character-image-container">
-            <img
-              [src]="lobby.host_character.image"
-              alt="{{ lobby.host_character.name }}"
-              class="character-image"
-            />
+<div class="form-container">
+  @if (mainSet) {
+    <mat-card>
+      <mat-card-title>Create a Lobby</mat-card-title>
+      <mat-card-content>
+        <form (ngSubmit)="onSubmit()" #lobbyForm="ngForm">
+          <div class="seeking-input">
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Seeking Character</mat-label>
+              <mat-select [(value)]="seekingCharacterIndex">
+                @for (character of characterList; track $index) {
+                  <mat-option [value]="$index">
+                    {{ character.name }}
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <button
+              mat-flat-button
+              color="primary"
+              type="button"
+              (click)="onAddSeekingCharacter()"
+            >
+              Add
+            </button>
           </div>
-        </div>
-      </div>
 
-      <div class="form-group">
-        <label for="seeking_character">Seeking Character:</label>
-        <div class="seeking-input">
-          <select
-            id="seeking_character"
-            [(ngModel)]="seekingCharacterIndex"
-            name="seeking_character"
-          >
-            @for (character of characterList; track $index) {
-              <option [value]="$index">{{ character.name }}</option>
+          <div class="character-icons">
+            @for (character of lobby.seeking_characters; track $index) {
+              <img
+                [src]="character.image"
+                alt="{{ character.name }}"
+                class="character-icon"
+                (click)="removeSeekingCharacter($index)"
+              />
             }
-          </select>
-          <button
-            type="button"
-            class="addbtn"
-            (click)="onAddSeekingCharacter()"
-          >
-            Add
-          </button>
-        </div>
-        <div class="character-icons">
-          @for (character of lobby.seeking_characters; track $index) {
-            <img
-              [src]="character.image"
-              alt="{{ character.name }}"
-              class="character-icon"
-              (click)="removeSeekingCharacter($index)"
+          </div>
+
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Lobby ID</mat-label>
+            <input
+              matInput
+              type="text"
+              [(ngModel)]="lobby.smash_lobby_id"
+              name="lobby_id"
+              autocomplete="off"
+              required
             />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Lobby Password</mat-label>
+            <input
+              matInput
+              type="password"
+              [(ngModel)]="lobby.smash_lobby_password"
+              name="lobby_password"
+              autocomplete="off"
+              required
+            />
+          </mat-form-field>
+
+          @if (loading) {
+            <div class="spinner-container">
+              <mat-spinner color="accent" diameter="40"></mat-spinner>
+            </div>
+            <button mat-flat-button color="accent" type="submit">
+              Create Lobby
+            </button>
+            <button mat-flat-button color="accent" type="submit" disabled>
+              Create Lobby
+            </button>
+            <p>You must set your main in your profile.</p>
           }
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="lobby_id">Lobby ID:</label>
-        <input
-          type="text"
-          id="lobby_id"
-          [(ngModel)]="lobby.smash_lobby_id"
-          name="lobby_id"
-          required
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="lobby_password">Lobby Password:</label>
-        <input
-          type="password"
-          id="lobby_password"
-          [(ngModel)]="lobby.smash_lobby_password"
-          name="lobby_password"
-          required
-        />
-      </div>
-
-      <button type="submit" class="btn">Create Lobby</button>
-    </form>
-  </div>
-</body>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <div class="main-not-set">
+      <p class="warning">You must set your main in your profile!</p>
+      <button
+        class="reset-button"
+        mat-flat-button
+        color="primary"
+        (click)="goToProfile()"
+      >
+        Go to Profile
+      </button>
+    </div>
+  }
+</div>

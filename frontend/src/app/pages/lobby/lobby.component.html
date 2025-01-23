@@ -1,118 +1,149 @@
 <div class="lobby-room">
-  <div class="chat-box">
-    <h3>Lobby Chat</h3>
-    <div class="messages" #messagesContainer>
-      @for (message of messages; track $index) {
-        @if (isMyMessage(message)) {
-          <div class="message-right message-bubble">
-            <div class="message-username">{{ message.username }}</div>
-            <div class="message-content">{{ message.content }}</div>
-          </div>
-        } @else if (message.sender == "System") {
-          <div class="message-system message-bubble">
-            <div class="message-content">{{ message.content }}</div>
-          </div>
-        } @else {
-          <div class="message-left message-bubble">
-            <div class="message-username">{{ message.username }}</div>
-            <div class="message-content">{{ message.content }}</div>
-          </div>
-        }
-      }
-    </div>
-    <div class="message-input">
-      <input
-        type="text"
-        [(ngModel)]="newMessage"
-        placeholder="Type your message..."
-        (keyup.enter)="sendMessage()"
-      />
-      <button (click)="sendMessage()">Send</button>
-    </div>
-  </div>
-
-  @if (isCreator) {
-    <div class="side-panel">
-      <h3>Lobby Control Panel</h3>
-
-      <div class="lobby-id-password">
-        <div class="form-group">
-          <label for="lobbyID">Lobby ID:</label>
-          <input
-            type="text"
-            id="lobbyID"
-            [(ngModel)]="lobby.smash_lobby_id"
-            placeholder="Lobby ID"
-          />
-        </div>
-        <div class="form-group">
-          <label for="lobbyPassword">Lobby Password:</label>
-          <input
-            type="text"
-            id="lobbyPassword"
-            [(ngModel)]="lobby.smash_lobby_password"
-            placeholder="Lobby Password"
-          />
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="hostCharacter">Current Character:</label>
-        <div class="host-character-container">
-          <img [src]="lobby.host_character.image" class="host-character-icon" />
-          <select
-            class="host-character-select"
-            id="hostCharacter"
-            [(ngModel)]="newHostCharacterIndex"
-            name="hostCharacter"
-          >
-            @for (character of characterList; track $index) {
-              <option [value]="$index">{{ character.name }}</option>
-            }
-          </select>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="newCharacter">Add Character:</label>
-        <div class="new-character-container">
-          <select
-            id="newCharacter"
-            [(ngModel)]="newSeekingCharacterIndex"
-            name="newCharacter"
-          >
-            @for (character of characterList; track $index) {
-              <option [value]="$index">{{ character.name }}</option>
-            }
-          </select>
-          <button (click)="addSeekingCharacter()">Add Character</button>
-        </div>
-      </div>
-
-      <h4>Current Characters:</h4>
-      <div class="character-icons">
-        @for (character of lobby.seeking_characters; track $index) {
+  <!-- Chat Box -->
+  <mat-card class="chat-box">
+    <mat-card-title>Lobby Chat</mat-card-title>
+    <mat-card-content>
+      <div class="messages" #messagesContainer>
+        @for (message of messages; track $index) {
           <ng-container>
-            <img
-              src="{{ character.image }}"
-              alt="{{ character.name }}"
-              class="character-icon"
-              (click)="removeSeekingCharacter($index)"
-            />
+            @if (isMyMessage(message)) {
+              <div class="message message-right">
+                <img
+                  class="message-avatar"
+                  [src]="message.avatarURL"
+                  alt="Profile"
+                />
+                <div class="message-bubble bubble-right">
+                  <div class="message-content">{{ message.content }}</div>
+                </div>
+              </div>
+            } @else if (message.sender === "System") {
+              <div class="message-system message-bubble">
+                <div class="message-content">{{ message.content }}</div>
+              </div>
+            } @else if (!isMyMessage(message) && message.sender !== "System") {
+              <div class="message message-left">
+                <img
+                  class="message-avatar"
+                  [src]="message.avatarURL"
+                  alt="Profile"
+                />
+                <div class="message-bubble bubble-left">
+                  <div class="message-content">{{ message.content }}</div>
+                </div>
+              </div>
+            }
           </ng-container>
         }
       </div>
-
-      <div class="control-panel-buttons">
-        <button (click)="updateLobby()">Update Lobby</button>
-        <button (click)="shutdownLobby()">Shutdown Lobby</button>
+    </mat-card-content>
+    <mat-card-actions>
+      <div class="message-input">
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Type your message...</mat-label>
+          <input
+            matInput
+            [(ngModel)]="newMessage"
+            (keyup.enter)="sendMessage()"
+          />
+        </mat-form-field>
+        <button mat-icon-button color="primary" (click)="sendMessage()">
+          <mat-icon>send</mat-icon>
+        </button>
       </div>
-    </div>
-  } @else {
-    <div class="side-panel">
-      <h3>Lobby Information</h3>
-      <h4>Lobby ID: {{ lobby.smash_lobby_id }}</h4>
-      <h4>Lobby Password: {{ lobby.smash_lobby_password }}</h4>
-    </div>
-  }
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- Side Panel -->
+  <mat-card class="side-panel">
+    @if (isCreator) {
+      <ng-container>
+        <mat-card-title>Lobby Control Panel</mat-card-title>
+        <mat-card-content>
+          <!-- Lobby ID and Password -->
+          <div class="lobby-id-password">
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Lobby ID</mat-label>
+              <input
+                matInput
+                [(ngModel)]="new_lobby_id"
+                placeholder="Lobby ID"
+                autocomplete="off"
+              />
+            </mat-form-field>
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Lobby Password</mat-label>
+              <input
+                matInput
+                [(ngModel)]="new_lobby_password"
+                placeholder="Lobby Password"
+                autocomplete="off"
+              />
+            </mat-form-field>
+          </div>
+
+          <!-- Add Seeking Character -->
+          <div class="form-group">
+            <mat-label>Add Character</mat-label>
+            <div class="new-character-container">
+              <mat-form-field appearance="fill" class="full-width">
+                <mat-label>Select Character</mat-label>
+                <mat-select [(value)]="newSeekingCharacterIndex">
+                  @for (character of characterList; track $index) {
+                    <mat-option [value]="$index">
+                      {{ character.name }}
+                    </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <button
+                mat-flat-button
+                color="primary"
+                (click)="addSeekingCharacter()"
+              >
+                Add Character
+              </button>
+            </div>
+          </div>
+
+          <!-- Current Characters -->
+          <h5>Current Characters:</h5>
+          <p>Click to Remove</p>
+          <div class="character-icons">
+            @for (character of lobby.seeking_characters; track $index) {
+              <ng-container>
+                <img
+                  [src]="character.image"
+                  alt="{{ character.name }}"
+                  class="character-icon"
+                  (click)="removeSeekingCharacter($index)"
+                />
+              </ng-container>
+            }
+          </div>
+
+          <!-- Control Panel Buttons -->
+          <div class="control-panel-buttons">
+            <button mat-flat-button color="accent" (click)="updateLobby()">
+              Update Lobby
+            </button>
+            <button mat-flat-button color="warn" (click)="shutdownLobby()">
+              Shutdown Lobby
+            </button>
+          </div>
+          @if (unsavedChanges) {
+            <p class="unsaved-changes">Unsaved Changes</p>
+          }
+        </mat-card-content>
+      </ng-container>
+    } @else {
+      <mat-card-title>Lobby Information</mat-card-title>
+      <mat-card-content>
+        @if (lobby) {
+          <h4>Lobby ID: {{ lobby.smash_lobby_id }}</h4>
+          <h4>Lobby Password: {{ lobby.smash_lobby_password }}</h4>
+        }
+      </mat-card-content>
+    }
+  </mat-card>
 </div>

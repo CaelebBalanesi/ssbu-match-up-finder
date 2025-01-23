@@ -17,9 +17,13 @@ db.serialize(() => {
   db.run(
     `
     CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL
+      id TEXT PRIMARY KEY,
+      username TEXT NOT NULL,
+      discriminator TEXT,
+      avatar TEXT,
+      email TEXT,
+      mfa_enabled INTEGER DEFAULT 0,
+      mainCharacter TEXT DEFAULT NULL
     )
   `,
     (err) => {

@@ -1,1 +1,67 @@
-<router-outlet />
+<mat-sidenav-container>
+  <mat-sidenav #snav mode="over" [fixedInViewport]="true" fixedTopGap="56">
+    <mat-nav-list>
+      @if (loggedIn) {
+        <a mat-list-item (click)="navigateTo('profile')">
+          <mat-icon>person</mat-icon>
+          <span>Profile</span>
+        </a>
+        <a mat-list-item (click)="navigateTo('settings')">
+          <mat-icon>settings</mat-icon>
+          <span>Settings</span>
+        </a>
+        <a mat-list-item (click)="logout()">
+          <mat-icon>exit_to_app</mat-icon>
+          <span>Logout</span>
+        </a>
+        <a mat-list-item (click)="navigateTo('tournaments')">
+          <mat-icon fontIcon="tour"></mat-icon>
+          <span>Partnered Tournaments</span>
+        </a>
+      } @else {
+        <a mat-list-item (click)="login()">
+          <mat-icon>login</mat-icon>
+          <span>Login</span>
+        </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <mat-toolbar class="mat-toolbar">
+      <div class="left">
+        <button class="menu-button" mat-icon-button (click)="snav.toggle()">
+          <mat-icon fontIcon="menu"></mat-icon>
+        </button>
+        @if (loggedIn) {
+          <div class="profile" [matBadge]="notificaions">
+            <img [src]="avatarUrl" alt="Avatar" class="avatar" />
+            <mat-icon
+              aria-hidden="false"
+              aria-label="Profile icon"
+              fontIcon="manage_accounts"
+              (click)="profile()"
+            ></mat-icon>
+          </div>
+          <span>{{ username }}</span>
+        }        
+      </div>
+      <img
+        src="Colored Base Logo.png"
+        alt="Logo"
+        class="logo"
+        (click)="navigateTo('')"
+      />
+      <div class="right">
+        @if (loggedIn) {
+          <button mat-flat-button color="warn" (click)="logout()">
+            Logout
+          </button>
+        } @else {
+          <button mat-flat-button (click)="login()">Login</button>
+        }
+      </div>
+    </mat-toolbar>
+    <router-outlet />
+  </mat-sidenav-content>
+</mat-sidenav-container>

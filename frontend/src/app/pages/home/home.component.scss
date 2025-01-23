@@ -1,160 +1,69 @@
+@import "../../../colors.scss";
+
+/* General styles */
 body {
-  height: 100vh;
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: normal;
-  align-items: center;
-  font-family: "Arial", sans-serif;
+  font-family: "Roboto", "Arial", sans-serif;
   background-color: #121212;
   color: #e0e0e0;
 }
 
-h2 {
-  color: #a4a4a4;
-  margin-bottom: 18px;
+.content-container {
+  text-align: center;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
-svg {
-  width: 100%;
-  height: auto;
+h2 {
+  color: #e0e0e0;
+  margin-bottom: 0;
+}
+
+h3 {
+  line-height: 1;
+  color: #bdbdbd;
+  margin-bottom: 20px;
+  font-size: 12px;
+}
+
+p {
+  font-size: 14px;
+  margin-top: 16px;
+  padding: 8px 14px;
+  color: #e0e0e0;
+  background-color: rgb(56, 47, 54);
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 20px;
 }
 
 .button-container {
   display: flex;
+  justify-content: center;
   gap: 20px;
-  margin-top: 20px;
+  flex-wrap: wrap;
 }
 
-button {
-  padding: 18px 28px;
-  font-size: 20px;
+.button-container button {
+  margin-top: 10px;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  max-width: 250px;
+  margin: 48px auto 0;
+}
+
+.logo-container img {
+  max-width: 100%;
+  height: auto;
   cursor: pointer;
-  border: none;
-  border-radius: 8px;
-  color: black;
-  transition:
-    background-color 0.3s,
-    transform 0.2s,
-    box-shadow 0.3s;
-  outline: none;
-  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
 }
 
-.search-button {
-  background-color: #00ffff;
-  transition:
-    background-color 0.3s,
-    transform 0.2s,
-    box-shadow 0.3s;
-}
-
-.search-button:hover,
-.search-button:focus {
-  background-color: #00ffff00;
-  outline: 2px solid #00ffff;
-  color: #00ffff;
-  transform: translateY(-2px);
-  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.25);
-}
-
-.create-button {
-  background-color: #ff00ff;
-  transition:
-    background-color 0.3s,
-    transform 0.2s,
-    box-shadow 0.3s;
-}
-
-.create-button:hover,
-.create-button:focus {
-  background-color: #ff00ff00;
-  outline: 2px solid #ff00ff;
-  color: #ff00ff;
-  transform: translateY(-2px);
-  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.25);
-}
-
-.login-button {
-  background-color: #ff00ff;
-  transition:
-    background-color 0.3s,
-    transform 0.2s,
-    box-shadow 0.3s;
-  width: 72px;
-  height: 40px;
-  font-size: 12px;
-  padding: 0px;
-  margin-right: 12px;
-}
-
-.register-button:hover,
-.register-button:focus {
-  background-color: #ff00ff00;
-  outline: 2px solid #ff00ff;
-  color: #ff00ff;
-  transform: translateY(-2px);
-  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.25);
-}
-
-.register-button {
-    background-color: #00ffff;
-    transition:
-      background-color 0.3s,
-      transform 0.2s,
-      box-shadow 0.3s;
-    width: 72px;
-    height: 40px;
-    font-size: 12px;
-    padding: 0px;
-  }
-  
-  .login-button:hover,
-  .login-button:focus {
-    background-color: #ff00ff00;
-    outline: 2px solid #00ffff;
-    color: #00ffff;
-    transform: translateY(-2px);
-    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.25);
-  }
-
-.logout-button {
-  background-color: #ff0000;
-  transition:
-    background-color 0.3s,
-    transform 0.2s,
-    box-shadow 0.3s;
-  width: 72px;
-  height: 40px;
-  font-size: 12px;
-  padding: 0px;
-  margin-left: 8px;
-}
-
-.logout-button:hover,
-.logout-button:focus {
-  background-color: #ff00ff00;
-  outline: 2px solid #ff0000;
-  color: #ff0000;
-  transform: translateY(-2px);
-  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.25);
-}
-
-.login-register-overlay {
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  margin: 12px;
-}
-
-/* Mobile responsiveness */
 @media (max-width: 600px) {
   .button-container {
     flex-direction: column;
-    gap: 10px;
-  }
-
-  h2 {
-    font-size: 1.25em;
   }
 }

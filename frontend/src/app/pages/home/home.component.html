@@ -1,23 +1,19 @@
-<body>
-  <div class="login-register-overlay">
-    @if (loggedIn) {
-      <p>
-        Logged in as {{ username
-        }}<button class="logout-button" (click)="logout()">Logout</button>
-      </p>
-    } @else {
-      <button class="login-button" (click)="login()">Login</button>
-      <button class="register-button" (click)="register()">Register</button>
-    }
-  </div>
-  <div class="logo-container">
-    <img src="Logo.png" alt="Logo" />
-  </div>
-  <h2>Build Matchup Experience</h2>
+<div class="logo-container">
+  <img src="Colored Base Logo.png" alt="Logo" />
+</div>
+
+<div class="content-container">
+  <h2>Smash<b>Ups</b></h2>
+  <h3>Build Matchup Experience</h3>
   <div class="button-container">
-    <button class="search-button" (click)="searchbutton()">
+    <button mat-flat-button color="primary" (click)="searchbutton()">
       Search for MU
     </button>
-    <button class="create-button" (click)="createbutton()">Create lobby</button>
+    <button mat-flat-button color="accent" (click)="createbutton()">
+      Create Lobby
+    </button>
   </div>
-</body>
+  @if (amountOfLobbies != -1) {
+    <p>{{ amountOfLobbies }} Lobbies</p>
+  }
+</div>

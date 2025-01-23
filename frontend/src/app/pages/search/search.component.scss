@@ -1,201 +1,176 @@
+@import "../../../colors.scss";
+
+/* General styles */
 body {
-  height: 100vh;
   margin: 0;
+  font-family: "Roboto", "Arial", sans-serif;
+  background-color: #f5f5f5;
+  color: #424242;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.mat-toolbar {
   display: flex;
-  flex-direction: column;
-  justify-content: normal;
-  align-items: center;
-  font-family: "Arial", sans-serif;
-  background-color: #121212;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.logo {
+  height: 100%;
+  cursor: pointer;
+  margin-right: 12px;
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  margin-right: 8px;
+  border: 2.5px solid #e0e0e0;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  max-width: 250px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 48px;
+  margin-bottom: 32px;
+}
+
+.logo-container img {
+  max-width: 100%;
+  height: auto;
+  cursor: pointer;
+}
+
+.search-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 20px;
+  margin-top: 32px;
+}
+
+.search-input-container {
+  background-color: $background-color-1;
+  margin-bottom: 24px;
+  padding: 32px;
+}
+
+.search-input-container mat-card-title {
   color: #e0e0e0;
+  margin: 12px;
+  font-size: xx-large;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.character-image-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
 .character-icon {
   width: 120px;
   height: 120px;
-  margin-bottom: 12px;
-}
-
-.search-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 50px;
-  color: #e0e0e0;
-}
-
-.search-form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 30px;
-  background-color: #222;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
-}
-
-.search-form label {
-  margin-bottom: 10px;
-  font-size: 1.2em;
-  color: #ccc;
-}
-
-.search-form select {
-  width: 85%;
-  padding: 6px;
-  font-size: 1em;
-  margin-bottom: 10px;
-  background-color: #333;
-  border: 1px solid #444;
-  border-radius: 5px;
-  color: #ddd;
-  outline: none;
-}
-
-.search-form select:focus {
-  background-color: #444;
-  border-color: #555;
-}
-
-.search-form button {
-  padding: 10px 20px;
-  font-size: 1em;
-  cursor: pointer;
-  background-color: #00ffff;
-  color: black;
-  border: none;
-  border-radius: 8px;
-  transition:
-    background-color 0.2s,
-    transform 0.2s,
-    box-shadow 0.2s;
-  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
-  outline: none;
-}
-
-.search-form button:hover,
-.search-form button:focus {
-  background-color: #00ffff00;
-  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.25);
-  outline: 2px solid #ff00ff;
-  color: #ff00ff;
-}
-
-.lobby-list {
-  width: 100%;
-  max-width: 600px;
-  text-align: left;
-  background-color: #222;
-  padding: 20px;
-  border-radius: 8px;
-  overflow-y: auto;
-  max-height: 400px;
-}
-
-.lobby-list h3 {
-  text-align: center;
-  color: #fff;
-}
-
-.lobby-list ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-.lobby-list li {
-  padding: 10px;
-  border: 1px solid #444;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  background-color: #333;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.lobby-list li button {
-  padding: 6px 12px;
-  background-color: #00ffff;
-  color: black;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition:
-    background-color 0.3s,
-    box-shadow 0.3s;
-  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
-}
-
-.lobby-list li button:hover,
-.lobby-list li button:focus {
-  background-color: #00ffff00;
-  outline: 2px solid #00ffff;
-  color: #00ffff;
-  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.25);
 }
 
 .no-lobbies {
   text-align: center;
   color: #888;
+  margin-top: 20px;
 }
 
-.login-overlay {
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  margin: 12px;
+.lobby-list mat-card-title {
+  color: white;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 8px;
 }
 
-.logout-button {
-  border-radius: 8px;
-  border: none;
-  background-color: #ff0000;
-  transition:
-    background-color 0.3s,
-    transform 0.2s,
-    box-shadow 0.3s;
-  width: 72px;
+.lobby-list mat-list {
+  justify-content: center;
+  max-height: 400px;
+  overflow-y: scroll;
+}
+
+.lobby-list mat-list-item div {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  flex: 1;
+}
+
+.lobby-list mat-list-item p {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lobby-list mat-list-item button {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.lobby-list mat-list-item p {
   height: 40px;
-  font-size: 12px;
-  padding: 0px;
-  margin-left: 8px;
-  outline: none;
+  font-size: 24px;
+  line-height: 36px;
+  margin: 0px;
+  margin-left: 12px;
 }
 
-.logout-button:hover,
-.login-button:focus {
-  background-color: #ff00ff00;
-  outline: 2px solid #ff0000;
-  color: #ff0000;
-  transform: translateY(-2px);
-  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.25);
+.lobby-list mat-list-item img {
+  height: 40px;
 }
 
-/* Mobile responsiveness */
+.lobby-list button {
+  margin-top: 8px;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.search-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.search-form button {
+  max-width: 160px;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.warning {
+  color: $warning;
+}
+
 @media (max-width: 600px) {
-  .search-container {
-    margin-top: 20px;
-    width: 90%;
+  .lobby-list mat-list-item {
+    flex-direction: row;
+    align-items: center;
   }
 
-  .search-form {
-    width: 100%;
-    padding: 15px;
-    box-shadow: none;
-    margin-bottom: 15px;
+  .lobby-list mat-list-item p {
+    flex: 1;
   }
 
-  .lobby-list {
-    max-height: 200px;
-  }
-
-  .lobby-list li {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .lobby-list li button {
-    margin-top: 10px;
+  .lobby-list mat-list-item button {
+    width: auto;
+    margin-left: auto;
   }
 }

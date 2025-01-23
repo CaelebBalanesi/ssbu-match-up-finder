@@ -1,68 +1,165 @@
-// sockets/lobbySocket.js
+// /sockets/socketHandler.js
+const User = require("../models/User");
 const { lobbies } = require("../routes/lobbies");
 const uuid = require("uuid");
 
-module.exports = (socket, io) => {
-  // Session handling
-  let sessionId = socket.handshake.query.sessionId;
+module.exports = (io) => {
+  io.on("connection", async (socket) => {
+    try {
+      const session = socket.request.session;
+      const userId = session?.passport?.user;
 
-  if (!sessionId || sessionId === "null") {
-    sessionId = uuid.v4();
-    socket.emit("sessionId", sessionId);
-  }
+      // Authenticate user
+      if (userId) {
+        const user = await User.findOne({ id: userId });
+        if (user) {
+          console.log(`User connected: ${user.username}`);
 
-  socket.sessionId = sessionId;
-  console.log(`[CONNECTION] New session ID: ${sessionId}`);
+          // Emit user data to the frontend
+          socket.emit("userData", user);
 
-  // Event: Join Lobby
-  socket.on("joinLobby", (data) => {
-    const { lobbyId, username } = data;
-    const lobby = lobbies[lobbyId];
+          // Initialize socket properties
+          socket.lobbyId = null;
 
-    if (!lobby) {
-      socket.emit("lobbyNotFound", { message: "Lobby not found." });
-      return;
-    }
+          // Event: Join Lobby
+          socket.on("joinLobby", ({ lobbyId }) => {
+            const username = user.username;
+            const lobby = lobbies[lobbyId];
 
-    if (lobby.users.length >= lobby.maxUsers) {
-      console.log(
-        `[LOBBY FULL] ${username} rejected from lobby ID: ${lobbyId}`,
-      );
-      socket.emit("lobbyFull", { message: "This lobby is full." });
-      return;
-    }
+            if (!lobby) {
+              console.log(`[ERROR] Lobby not found: Lobby ID: ${lobbyId}`);
+              socket.emit("lobbyNotFound", { message: "Lobby not found." });
+              return;
+            }
 
-    console.log(`[JOINED LOBBY] ${username} joined lobby ID: ${lobbyId}`);
-    lobby.users.push({ userId: socket.id, username });
-    socket.join(lobbyId);
+            if (lobby.users.length >= lobby.maxUsers) {
+              console.log(
+                `[LOBBY FULL] User: ${username} rejected from Lobby ID: ${lobbyId}`,
+              );
+              socket.emit("lobbyFull", { message: "This lobby is full." });
+              return;
+            }
 
-    // Notify others in the lobby
-    socket.to(lobbyId).emit("userJoined", { username });
+            console.log(
+              `[LOBBY JOINED] User: ${username} joined Lobby ID: ${lobbyId}`,
+            );
+            lobby.users.push({ userId: socket.id, username });
+            socket.join(lobbyId);
+            socket.lobbyId = lobbyId;
 
-    // Notify user of successful join
-    socket.emit("joinedLobby", { lobbyId, users: lobby.users });
-  });
+            socket.to(lobbyId).emit("userJoined", { username });
+            socket.emit("joinedLobby", { lobbyId, users: lobby.users });
+          });
 
-  // Event: Message
-  socket.on("message", (data) => {
-    const { lobbyId, message, username } = data;
-    console.log(`[MESSAGE] Lobby ID: ${lobbyId}\n${username}: ${message}`);
-    io.to(lobbyId).emit("message", { lobbyId, content: message, username });
-  });
+          // Event: Message
+          socket.on("message", ({ lobbyId, message, avatarURL }) => {
+            console.log(
+              `Message event received on server for Socket ID: ${socket.id}`,
+            );
+            console.log(`LobbyID: ${lobbyId}, Message: ${message}`);
+            const username = user.username;
+            console.log(`Profile Pic: ${avatarURL}`);
+            if (!lobbyId || !message || !avatarURL) return;
 
-  // Event: Disconnect from Lobby
-  socket.on("disconnectFromLobby", () => {
-    Object.keys(lobbies).forEach((lobbyId) => {
-      const lobby = lobbies[lobbyId];
-      const index = lobby.users.findIndex((user) => user.userId === socket.id);
-      if (index !== -1) {
-        const { username } = lobby.users[index];
-        lobby.users.splice(index, 1);
-        console.log(
-          `[DISCONNECT] ${username} disconnected from lobby ID: ${lobbyId}`,
-        );
-        socket.to(lobbyId).emit("userLeft", { username });
+            console.log(
+              `[MESSAGE RECEIVED] User: ${username}, Lobby ID: ${lobbyId}, Message: ${message}`,
+            );
+            console.log(`Profile Pic: ${avatarURL}`);
+            io.to(lobbyId).emit("message", {
+              lobbyId,
+              content: message,
+              username,
+              avatarURL: avatarURL,
+            });
+          });
+
+          socket.on("updateLobby", ({ lobbyId, lobby }) => {
+            console.log(`Lobby ${lobbyId} Updating`);
+
+            if (!lobby) return;
+
+            lobbies[lobbyId] = lobby;
+            console.log(`Lobby ${lobbyId} Updated`);
+
+            io.to(lobbyId).emit("updateLobby", { lobbyId, lobby: lobby });
+          });
+
+          // Event: Leave Lobby
+          socket.on("leaveLobby", () => {
+            const lobbyId = socket.lobbyId;
+            const username = user.username;
+
+            if (lobbyId && lobbies[lobbyId]) {
+              const lobby = lobbies[lobbyId];
+              const userIndex = lobby.users.findIndex(
+                (u) => u.userId === socket.id,
+              );
+
+              if (userIndex !== -1) {
+                lobby.users.splice(userIndex, 1);
+                socket.leave(lobbyId);
+                socket.to(lobbyId).emit("userLeft", { username });
+
+                if (username === lobby.host_username) {
+                  delete lobbies[lobbyId];
+                  io.to(lobbyId).emit("lobbyClosed", {
+                    message: "The host has left. This lobby is now closed.",
+                  });
+                }
+              }
+            }
+            socket.lobbyId = null;
+          });
+
+          // Event: Disconnect
+          socket.on("disconnect", (reason) => {
+            const lobbyId = socket.lobbyId;
+            const username = user.username;
+
+            if (lobbyId && lobbies[lobbyId]) {
+              const lobby = lobbies[lobbyId];
+              const userIndex = lobby.users.findIndex(
+                (u) => u.userId === socket.id,
+              );
+
+              if (userIndex !== -1) {
+                lobby.users.splice(userIndex, 1);
+                socket.to(lobbyId).emit("userLeft", { username });
+
+                if (username === lobby.host_username) {
+                  delete lobbies[lobbyId];
+                  io.to(lobbyId).emit("lobbyClosed", {
+                    message: "The host has left. This lobby is now closed.",
+                  });
+                }
+              }
+            }
+            socket.lobbyId = null;
+            console.log(
+              `[DISCONNECT] User: ${username}, Socket ID: ${socket.id}, Reason: ${reason}`,
+            );
+          });
+        } else {
+          console.log(`User not found in database: ${userId}`);
+          socket.emit("unauthorized");
+          socket.disconnect();
+        }
+      } else {
+        console.log("Unauthenticated user tried to connect");
+        socket.emit("unauthorized");
+        socket.disconnect();
       }
-    });
+
+      // Error handling
+      socket.on("error", (error) => {
+        console.error("Socket.IO error:", error);
+        socket.emit("error", "Internal server error");
+        socket.disconnect();
+      });
+    } catch (err) {
+      console.error("Error in Socket.IO connection:", err);
+      socket.emit("error", "Internal server error");
+      socket.disconnect();
+    }
   });
 };
